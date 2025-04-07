@@ -12,10 +12,14 @@
   --dark-bg: #171923;
   --card-bg: rgba(23, 25, 35, 0.95);
   --header-height: 60px;
-  --preview-height: 250px;
-  --database-header-height: 100px;
+  --preview-height: 200px;
+  --database-header-height: 80px;
   --button-bg: rgba(255, 255, 255, 0.1);
   --button-hover-bg: rgba(255, 255, 255, 0.2);
+  --neon-border: 2px solid #6dd5ed;
+  --neon-glow: 0 0 20px rgba(109, 213, 237, 0.5),
+               0 0 40px rgba(102, 126, 234, 0.3),
+               0 0 60px rgba(118, 75, 162, 0.2);
 }
 
 @keyframes gradientBG {
@@ -59,10 +63,12 @@ body {
 
 .app-container {
   height: 100vh;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .app-header {
@@ -70,17 +76,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
-  border-radius: 15px;
+  padding: 0 16px;
+  border-radius: 12px;
   background: rgba(23, 25, 35, 0.8);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  animation: borderGlow 4s ease-in-out infinite;
+  border: var(--neon-border);
+  box-shadow: var(--neon-glow);
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   background: linear-gradient(-45deg, #6dd5ed, #2193b0, #764ba2, #667eea);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
@@ -90,19 +96,19 @@ body {
 
 .storage-indicator {
   background: rgba(23, 25, 35, 0.9);
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 11px;
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(107, 213, 237, 0.1);
+  box-shadow: var(--neon-shadow);
 }
 
 .main-layout {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
   min-height: 0;
 }
@@ -110,17 +116,17 @@ body {
 .sticky-preview {
   height: var(--preview-height);
   background: rgba(23, 25, 35, 0.8);
-  border-radius: 15px;
-  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  border: var(--neon-border);
   overflow: auto;
   backdrop-filter: blur(10px);
-  animation: borderGlow 4s ease-in-out infinite;
+  box-shadow: var(--neon-glow);
 }
 
 .restaurant-preview {
   background: var(--card-bg);
-  border-radius: 15px;
-  padding: 15px;
+  border-radius: 12px;
+  padding: 12px;
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
 }
@@ -129,14 +135,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(107, 213, 237, 0.2);
 }
 
 .preview-header h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   background: linear-gradient(-45deg, #6dd5ed, #2193b0, #764ba2, #667eea);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
@@ -974,61 +980,7 @@ tr.selected-row {
   }
   
   .action-buttons button {
-    flex: 1 0 calc(50% - 10px);
-    justify-content: center;
-    font-size: 12px;
-    padding: 8px 12px;
+    flex: 1;
+    min-width: 120px;
   }
-  
-  .modal-content {
-    padding: 15px;
-    width: 95%;
-  }
-  
-  th, td {
-    padding: 8px;
-    font-size: 12px;
-  }
-}
-
-/* Ajout des styles pour la table horizontalement scrollable */
-.table-container {
-  overflow-x: auto;
-  margin-bottom: 20px;
-}
-
-table {
-  min-width: 1200px;
-}
-
-td.phone-cell,
-td.hours-cell,
-td.stars-cell,
-td.reviews-cell {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 150px;
-}
-
-.table-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.table-container::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(-45deg, #667eea, #764ba2, #2193b0, #6dd5ed);
-  background-size: 300% 300%;
-  animation: gradientBG 8s ease infinite;
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(-45deg, #2193b0, #6dd5ed, #667eea, #764ba2);
-  background-size: 300% 300%;
-  animation: gradientBG 8s ease infinite;
 }
