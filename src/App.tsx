@@ -3,10 +3,12 @@ import { auth } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { LoginPage } from './components/LoginPage';
 import MainApp from './components/MainApp';
+import { Sidebar } from './components/Sidebar';
 import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -24,7 +26,14 @@ function App() {
     );
   }
 
-  return isAuthenticated ? <MainApp /> : <LoginPage />;
+  return isAuthenticated ? (
+    <div className={`app-wrapper ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
+      <MainApp />
+      <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+    </div>
+  ) : (
+    <LoginPage />
+  );
 }
 
 export default App;

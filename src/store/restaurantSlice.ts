@@ -17,6 +17,8 @@ interface Restaurant {
   lat?: number;
   lng?: number;
   category: 'Restaurants' | 'Hôtels';
+  createdAt?: string;
+  updatedAt?: string;
   [key: string]: string | number | undefined;
 }
 
@@ -172,6 +174,17 @@ export const restaurantSlice = createSlice({
   }
 });
 
+// Helper function to convert Firestore timestamps to ISO strings
+const convertTimestamps = (doc: any) => {
+  const data = doc.data();
+  return {
+    ...data,
+    id: doc.id,
+    createdAt: data.createdAt?.toDate().toISOString(),
+    updatedAt: data.updatedAt?.toDate().toISOString()
+  };
+};
+
 // Thunks
 export const fetchRestaurants = (category: 'Restaurants' | 'Hôtels') => async (dispatch: any) => {
   try {
@@ -183,9 +196,9 @@ export const fetchRestaurants = (category: 'Restaurants' | 'Hôtels') => async (
       getDocs(collection(db, getCollectionForStatus('rejected', category)))
     ]);
 
-    const visible = visibleSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Restaurant[];
-    const accepted = acceptedSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Restaurant[];
-    const rejected = rejectedSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Restaurant[];
+    const visible = visibleSnapshot.docs.map(convertTimestamps) as Restaurant[];
+    const accepted = acceptedSnapshot.docs.map(convertTimestamps) as Restaurant[];
+    const rejected = rejectedSnapshot.docs.map(convertTimestamps) as Restaurant[];
 
     dispatch(setInitialData({ visible, accepted, rejected }));
   } catch (error) {
@@ -204,7 +217,16 @@ export const addRestaurant = (restaurant: Omit<Restaurant, 'id'>) => async (disp
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
-    dispatch(addRestaurantSuccess({ ...restaurant, id: docRef.id }));
+    
+    // Convert timestamps to ISO strings before dispatching
+    const newRestaurant = {
+      ...restaurant,
+      id: docRef.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    dispatch(addRestaurantSuccess(newRestaurant));
   } catch (error) {
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
@@ -244,13 +266,19 @@ export const moveRestaurant = (
     
     // Add to destination collection
     const destCollection = getCollectionForStatus(toStatus, restaurant.category);
+    const timestamp = new Date().toISOString();
+    const restaurantWithTimestamp = {
+      ...restaurant,
+      updatedAt: timestamp
+    };
+    
     const docRef = await addDoc(collection(db, destCollection), {
       ...restaurant,
       updatedAt: serverTimestamp()
     });
     
     dispatch(moveRestaurantSuccess({ 
-      restaurant: { ...restaurant, id: docRef.id }, 
+      restaurant: { ...restaurantWithTimestamp, id: docRef.id }, 
       fromStatus, 
       toStatus 
     }));
@@ -269,11 +297,18 @@ export const updateRestaurant = (
     dispatch(setLoading(true));
     const collectionName = getCollectionForStatus(database, restaurant.category);
     const restaurantRef = doc(db, collectionName, restaurant.id!);
+    
+    const timestamp = new Date().toISOString();
     const updatedRestaurant = {
       ...restaurant,
-      updatedAt: serverTimestamp()
+      updatedAt: timestamp
     };
-    await updateDoc(restaurantRef, updatedRestaurant);
+    
+    await updateDoc(restaurantRef, {
+      ...restaurant,
+      updatedAt: serverTimestamp()
+    });
+    
     dispatch(updateRestaurantSuccess({ restaurant: updatedRestaurant, database }));
   } catch (error) {
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
