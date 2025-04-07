@@ -11,9 +11,9 @@
   --neon-shadow: 0 0 15px rgba(107, 213, 237, 0.3);
   --dark-bg: #171923;
   --card-bg: rgba(23, 25, 35, 0.95);
-  --header-height: 80px;
-  --preview-height: 400px;
-  --database-header-height: 120px;
+  --header-height: 60px;
+  --preview-height: 250px;
+  --database-header-height: 100px;
   --button-bg: rgba(255, 255, 255, 0.1);
   --button-hover-bg: rgba(255, 255, 255, 0.2);
 }
@@ -58,12 +58,11 @@ body {
 }
 
 .app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
   height: 100vh;
+  padding: 10px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .app-header {
@@ -71,8 +70,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 20px;
+  padding: 0 20px;
   border-radius: 15px;
   background: rgba(23, 25, 35, 0.8);
   backdrop-filter: blur(10px);
@@ -82,7 +80,7 @@ body {
 
 .app-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   background: linear-gradient(-45deg, #6dd5ed, #2193b0, #764ba2, #667eea);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
@@ -104,7 +102,7 @@ body {
 .main-layout {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   flex: 1;
   min-height: 0;
 }
@@ -122,7 +120,7 @@ body {
 .restaurant-preview {
   background: var(--card-bg);
   border-radius: 15px;
-  padding: 20px;
+  padding: 15px;
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
 }
@@ -131,14 +129,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(107, 213, 237, 0.2);
 }
 
 .preview-header h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   background: linear-gradient(-45deg, #6dd5ed, #2193b0, #764ba2, #667eea);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
@@ -155,13 +153,13 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   color: white;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   transition: all 0.3s;
   backdrop-filter: blur(5px);
 }
@@ -187,14 +185,14 @@ body {
 
 .restaurant-card {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
 }
 
 .restaurant-field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .field-header {
@@ -204,7 +202,7 @@ body {
 }
 
 .field-header label {
-  font-size: 12px;
+  font-size: 11px;
   color: #a0aec0;
 }
 
@@ -229,10 +227,10 @@ body {
 .restaurant-field input {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 6px;
+  padding: 8px;
   color: white;
-  font-size: 14px;
+  font-size: 12px;
   transition: all 0.3s ease;
 }
 
@@ -256,7 +254,7 @@ body {
 
 .database-header {
   height: var(--database-header-height);
-  padding: 20px;
+  padding: 15px;
   border-bottom: 1px solid rgba(107, 213, 237, 0.2);
 }
 
@@ -264,13 +262,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .database-navigation h3 {
   margin: 0;
   text-align: center;
   flex-grow: 1;
+  font-size: 16px;
   background: linear-gradient(-45deg, #6dd5ed, #2193b0, #764ba2, #667eea);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
@@ -282,8 +281,8 @@ body {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--glass-border);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -301,17 +300,17 @@ body {
 
 .search-bar {
   position: relative;
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 .search-input {
   width: 100%;
-  padding: 12px 40px 12px 15px;
+  padding: 8px 35px 8px 12px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: white;
-  font-size: 14px;
+  font-size: 12px;
   transition: all 0.3s ease;
 }
 
@@ -323,7 +322,7 @@ body {
 
 .search-icon {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: #a0aec0;
@@ -332,18 +331,18 @@ body {
 .table-container {
   flex: 1;
   overflow: auto;
-  padding: 0 20px 20px;
+  padding: 0 15px 15px;
 }
 
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 th, td {
-  padding: 12px 15px;
+  padding: 8px 12px;
   text-align: left;
   border-bottom: 1px solid rgba(107, 213, 237, 0.1);
 }
@@ -555,14 +554,14 @@ tr.selected-row {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .action-buttons button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 8px 16px;
   border-radius: 8px;
   border: 1px solid var(--glass-border);
   color: white;
@@ -570,7 +569,7 @@ tr.selected-row {
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  font-size: 14px;
+  font-size: 12px;
   background: linear-gradient(-45deg, #667eea, #764ba2, #2193b0, #6dd5ed);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
@@ -643,7 +642,7 @@ tr.selected-row {
 
 .modal-content {
   background: rgba(23, 25, 35, 0.95);
-  padding: 25px;
+  padding: 20px;
   border-radius: 15px;
   border: 1px solid var(--glass-border);
   max-width: 500px;
@@ -675,7 +674,7 @@ tr.selected-row {
 .modal-content h3 {
   margin-top: 0;
   margin-bottom: 20px;
-  font-size: 18px;
+  font-size: 16px;
   background: linear-gradient(-45deg, #6dd5ed, #2193b0, #764ba2, #667eea);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
@@ -930,8 +929,8 @@ tr.selected-row {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -962,6 +961,8 @@ tr.selected-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
+    height: auto;
+    padding: 15px;
   }
   
   .restaurant-card {
@@ -973,7 +974,7 @@ tr.selected-row {
   }
   
   .action-buttons button {
-    flex: 1 0 calc(50 % - 10px);
+    flex: 1 0 calc(50% - 10px);
     justify-content: center;
     font-size: 12px;
     padding: 8px 12px;

@@ -5,7 +5,6 @@ import { auth } from '../lib/firebase';
 import { Download, Upload, Trash2, Save, X, Check, X as XIcon, ChevronLeft, ChevronRight, Plus, Edit2, Search, Undo2, Redo2, LogOut } from 'lucide-react';
 import { OpeningStatus } from './OpeningStatus';
 import { Classification } from './Classification';
-import { TaskManager } from './TaskManager';
 import { DataManager } from './DataManager';
 import { ApiKeyManager } from './ApiKeyManager';
 import { CategorySelector } from './CategorySelector';
@@ -70,7 +69,6 @@ function MainApp() {
   const [currentNoteIndex, setCurrentNoteIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [appointments, setAppointments] = useState([]);
-  const [tasks, setTasks] = useState([]);
   const [mockRestaurant, setMockRestaurant] = useState<Restaurant>({
     Nom: "Le Bistrot Parisien",
     Étoiles: "4.5 étoiles",
@@ -245,7 +243,6 @@ function MainApp() {
       rejected: data.restaurants.rejected
     }));
     setAppointments(data.calendar);
-    setTasks(data.tasks);
   };
 
   const handleUndo = () => {
@@ -599,7 +596,7 @@ function MainApp() {
           acceptedData={acceptedData}
           rejectedData={rejectedData}
           appointments={appointments}
-          tasks={tasks}
+          tasks={[]}
           onImport={handleGlobalImport}
         />
       </div>
@@ -770,8 +767,6 @@ function MainApp() {
           {error}
         </div>
       )}
-
-      <TaskManager />
     </div>
   );
 }
