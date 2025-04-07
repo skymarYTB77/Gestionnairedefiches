@@ -6,7 +6,6 @@ import { Download, Upload, Trash2, Save, X, Check, X as XIcon, ChevronLeft, Chev
 import { OpeningStatus } from './OpeningStatus';
 import { Classification } from './Classification';
 import { DataManager } from './DataManager';
-import { ApiKeyManager } from './ApiKeyManager';
 import { CategorySelector } from './CategorySelector';
 import { RootState } from '../store/store';
 import {
@@ -374,16 +373,13 @@ function MainApp() {
           }}>
             {visibleData.length} fiches en attente, {acceptedData.length} acceptées, {rejectedData.length} rejetées ({storageInfo.usedMB}/{storageInfo.limitMB} MB)
           </div>
-          <div className="flex items-center gap-4">
-            <ApiKeyManager />
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              <LogOut className="h-5 w-5 mr-2" />
-              Déconnexion
-            </button>
-          </div>
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          >
+            <LogOut className="h-5 w-5 mr-2" />
+            Déconnexion
+          </button>
         </div>
       </header>
 
@@ -437,14 +433,16 @@ function MainApp() {
             </div>
             
             <div className="search-bar">
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Rechercher..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Search size={20} className="search-icon" />
+              <div className="search-input-container">
+                <Search size={20} className="search-icon" />
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Rechercher..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
           </div>
           
