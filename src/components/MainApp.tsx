@@ -5,10 +5,8 @@ import { auth } from '../lib/firebase';
 import { Download, Upload, Trash2, Save, X, Check, X as XIcon, ChevronLeft, ChevronRight, Plus, Edit2, Search, Undo2, Redo2, LogOut } from 'lucide-react';
 import { OpeningStatus } from './OpeningStatus';
 import { Classification } from './Classification';
-import { Calendar } from './Calendar';
 import { TaskManager } from './TaskManager';
 import { DataManager } from './DataManager';
-import { GeminiChat } from './GeminiChat';
 import { ApiKeyManager } from './ApiKeyManager';
 import { CategorySelector } from './CategorySelector';
 import { RootState } from '../store/store';
@@ -773,25 +771,7 @@ function MainApp() {
         </div>
       )}
 
-      <Calendar />
       <TaskManager />
-      <GeminiChat
-        onAddTask={(task) => {
-          // Implement task addition logic
-        }}
-        onAddAppointment={(appointment) => {
-          // Implement appointment addition logic
-        }}
-        onUpdateNote={(id, note) => {
-          // Implement note update logic
-        }}
-        onUpdateClassification={(id, classification) => {
-          // Implement classification update logic
-        }}
-        onDeleteRestaurant={(id) => {
-          // Implement restaurant deletion logic
-        }}
-      />
     </div>
   );
 }
