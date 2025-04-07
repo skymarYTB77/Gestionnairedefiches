@@ -7,17 +7,24 @@
   width: 100%;
   max-width: 800px;
   padding: 0 20px;
+  transition: all 0.3s ease;
+  padding-right: calc(20px + var(--sidebar-width));
+}
+
+.app-wrapper.sidebar-closed .fixed-bottom-buttons {
+  padding-right: 20px;
 }
 
 .button-container {
   display: flex;
   justify-content: center;
   gap: 20px;
-  background: var(--card-bg);
+  background: rgba(23, 25, 35, 0.8);
   padding: 20px;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .export-options,
@@ -203,5 +210,9 @@
   .import-button,
   .delete-all-button {
     width: 100%;
+  }
+
+  .fixed-bottom-buttons {
+    padding-right: 20px;
   }
 }

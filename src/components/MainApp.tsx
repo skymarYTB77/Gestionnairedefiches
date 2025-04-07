@@ -115,25 +115,6 @@ function MainApp() {
     setTimeout(() => setMessage(null), 2000);
   };
 
-  const checkStorageLimit = () => {
-    const totalSize = new Blob([
-      JSON.stringify(visibleData),
-      JSON.stringify(acceptedData),
-      JSON.stringify(rejectedData)
-    ]).size;
-    
-    const storageLimit = 5 * 1024 * 1024;
-    const percentageUsed = (totalSize / storageLimit) * 100;
-    
-    return {
-      used: totalSize,
-      limit: storageLimit,
-      percentage: percentageUsed,
-      usedMB: (totalSize / (1024 * 1024)).toFixed(2),
-      limitMB: (storageLimit / (1024 * 1024)).toFixed(2)
-    };
-  };
-
   const addCustomField = () => {
     if (!newFieldName.trim()) {
       showTemporaryMessage("Le nom du champ ne peut pas être vide !");
@@ -152,12 +133,6 @@ function MainApp() {
   };
 
   const saveRestaurant = () => {
-    const storageInfo = checkStorageLimit();
-    if (storageInfo.percentage >= 90) {
-      showTemporaryMessage("Attention: Espace de stockage presque plein!");
-      return;
-    }
-
     const isDuplicate = [...visibleData, ...acceptedData, ...rejectedData].some(fiche => 
       fiche.Nom === mockRestaurant.Nom && fiche.Adresse === mockRestaurant.Adresse
     );
@@ -175,7 +150,7 @@ function MainApp() {
     };
 
     dispatch(addRestaurant(restaurantToSave));
-    showTemporaryMessage(`Fiche sauvegardée ! (${visibleData.length + 1})`);
+    showTemporaryMessage(`Fiche sauvegardée !`);
   };
 
   const handleDeleteRestaurant = (id: string, database: 'visible' | 'accepted' | 'rejected') => {
@@ -343,8 +318,6 @@ function MainApp() {
     }
   };
 
-  const storageInfo = checkStorageLimit();
-
   return (
     <div className="app-container">
       <header className="app-header">
@@ -367,12 +340,6 @@ function MainApp() {
           >
             <Redo2 size={20} />
           </button>
-          <div className="storage-indicator" style={{
-            color: storageInfo.percentage > 80 ? '#ff4444' : 
-                   storageInfo.percentage > 60 ? '#ffaa00' : '#ffffff'
-          }}>
-            {visibleData.length} fiches en attente, {acceptedData.length} acceptées, {rejectedData.length} rejetées ({storageInfo.usedMB}/{storageInfo.limitMB} MB)
-          </div>
           <button
             onClick={handleLogout}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
