@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -9,10 +9,13 @@ import {
   Upload,
   Clock,
   Star,
-  Users
+  Users,
+  CheckSquare,
+  Bookmark
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { AppModal } from './AppModal';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,6 +26,9 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const { visibleData, acceptedData, rejectedData } = useSelector(
     (state: RootState) => state.restaurants
   );
+
+  const [showTaskManager, setShowTaskManager] = useState(false);
+  const [showBookmarks, setShowBookmarks] = useState(false);
 
   const recentActivities = [
     {
@@ -94,31 +100,43 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         </div>
 
         <div className="sidebar-section">
-          <h3>Actions rapides</h3>
+          <h3>Applications</h3>
           <div className="quick-actions">
-            <button className="quick-action-button">
-              <FileText size={16} />
-              <span>Nouvelle fiche</span>
+            <button 
+              className="quick-action-button"
+              onClick={() => setShowTaskManager(true)}
+            >
+              <CheckSquare size={16} />
+              <span>Gestionnaire de tâches</span>
             </button>
-            <button className="quick-action-button">
-              <Download size={16} />
-              <span>Exporter les données</span>
-            </button>
-            <button className="quick-action-button">
-              <Upload size={16} />
-              <span>Importer des fiches</span>
-            </button>
-            <button className="quick-action-button">
-              <Settings size={16} />
-              <span>Paramètres</span>
-            </button>
-            <button className="quick-action-button">
-              <Clock size={16} />
-              <span>Historique</span>
+            <button 
+              className="quick-action-button"
+              onClick={() => setShowBookmarks(true)}
+            >
+              <Bookmark size={16} />
+              <span>Signets</span>
             </button>
           </div>
         </div>
       </div>
+
+      <AppModal
+        isOpen={showTaskManager}
+        onClose={() => setShowTaskManager(false)}
+        title="Gestionnaire de tâches"
+        url="https://gestionnairedetaches.netlify.app/"
+        width="90vw"
+        height="90vh"
+      />
+
+      <AppModal
+        isOpen={showBookmarks}
+        onClose={() => setShowBookmarks(false)}
+        title="Signets"
+        url="https://signets.netlify.app/"
+        width="90vw"
+        height="90vh"
+      />
     </>
   );
 }
