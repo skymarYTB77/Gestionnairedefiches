@@ -75,7 +75,7 @@ export function AppModal({ isOpen, onClose, url }: AppModalProps) {
         <iframe
           ref={iframeRef}
           src={url}
-          className="w-[800px] h-[600px] bg-[#1a1b1e] rounded-lg shadow-xl"
+          className="w-[800px] h-[500px] bg-[#1a1b1e] rounded-lg shadow-xl"
           style={{ 
             border: 'none',
             transform: 'scale(0.9)',
