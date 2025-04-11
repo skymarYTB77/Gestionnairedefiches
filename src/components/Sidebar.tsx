@@ -20,15 +20,37 @@ import { AppModal } from './AppModal';
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
+  onModalOpen: () => void;
+  onModalClose: () => void;
 }
 
-export function Sidebar({ isOpen, onToggle }: SidebarProps) {
+export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: SidebarProps) {
   const { visibleData, acceptedData, rejectedData } = useSelector(
     (state: RootState) => state.restaurants
   );
 
   const [showTaskManager, setShowTaskManager] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
+
+  const handleOpenTaskManager = () => {
+    setShowTaskManager(true);
+    onModalOpen();
+  };
+
+  const handleCloseTaskManager = () => {
+    setShowTaskManager(false);
+    onModalClose();
+  };
+
+  const handleOpenBookmarks = () => {
+    setShowBookmarks(true);
+    onModalOpen();
+  };
+
+  const handleCloseBookmarks = () => {
+    setShowBookmarks(false);
+    onModalClose();
+  };
 
   const recentActivities = [
     {
@@ -104,14 +126,14 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
           <div className="quick-actions">
             <button 
               className="quick-action-button"
-              onClick={() => setShowTaskManager(true)}
+              onClick={handleOpenTaskManager}
             >
               <CheckSquare size={16} />
               <span>Gestionnaire de tâches</span>
             </button>
             <button 
               className="quick-action-button"
-              onClick={() => setShowBookmarks(true)}
+              onClick={handleOpenBookmarks}
             >
               <Bookmark size={16} />
               <span>Signets</span>
@@ -122,20 +144,14 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
       <AppModal
         isOpen={showTaskManager}
-        onClose={() => setShowTaskManager(false)}
-        title="Gestionnaire de tâches"
+        onClose={handleCloseTaskManager}
         url="https://gestionnairedetaches.netlify.app/"
-        width="600px"
-        height="400px"
       />
 
       <AppModal
         isOpen={showBookmarks}
-        onClose={() => setShowBookmarks(false)}
-        title="Signets"
+        onClose={handleCloseBookmarks}
         url="https://signets.netlify.app/"
-        width="600px"
-        height="400px"
       />
     </>
   );

@@ -12,6 +12,7 @@ interface DataManagerProps {
   appointments: any[];
   tasks: any[];
   onImport: (data: GlobalData) => void;
+  isHidden?: boolean;
 }
 
 export function DataManager({
@@ -20,7 +21,8 @@ export function DataManager({
   rejectedData,
   appointments,
   tasks,
-  onImport
+  onImport,
+  isHidden = false
 }: DataManagerProps) {
   const dispatch = useDispatch();
   const [message, setMessage] = useState<string | null>(null);
@@ -170,6 +172,8 @@ export function DataManager({
     reader.readAsText(file);
     setShowImportMenu(false);
   };
+
+  if (isHidden) return null;
 
   return (
     <div className="fixed-bottom-buttons">

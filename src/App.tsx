@@ -9,6 +9,7 @@ import './App.css';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -28,8 +29,16 @@ function App() {
 
   return isAuthenticated ? (
     <div className={`app-wrapper ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
-      <MainApp />
-      <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <MainApp 
+        isSidebarOpen={isSidebarOpen} 
+        isModalOpen={isModalOpen} 
+      />
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+        onModalOpen={() => setIsModalOpen(true)}
+        onModalClose={() => setIsModalOpen(false)}
+      />
     </div>
   ) : (
     <LoginPage />

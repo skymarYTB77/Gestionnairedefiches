@@ -42,7 +42,12 @@ function generateUniqueId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-function MainApp() {
+interface MainAppProps {
+  isSidebarOpen: boolean;
+  isModalOpen: boolean;
+}
+
+function MainApp({ isSidebarOpen, isModalOpen }: MainAppProps) {
   const dispatch = useDispatch();
   const currentCategory = useSelector((state: RootState) => state.category.currentCategory);
   const { 
@@ -563,6 +568,7 @@ function MainApp() {
           appointments={appointments}
           tasks={[]}
           onImport={handleGlobalImport}
+          isHidden={isSidebarOpen || isModalOpen}
         />
       </div>
 
