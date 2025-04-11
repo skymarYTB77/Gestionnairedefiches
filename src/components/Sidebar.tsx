@@ -125,8 +125,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         onClose={() => setShowTaskManager(false)}
         title="Gestionnaire de tâches"
         url="https://gestionnairedetaches.netlify.app/"
-        width="90vw"
-        height="90vh"
+        width="600px"
+        height="400px"
       />
 
       <AppModal
@@ -134,8 +134,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         onClose={() => setShowBookmarks(false)}
         title="Signets"
         url="https://signets.netlify.app/"
-        width="90vw"
-        height="90vh"
+        width="600px"
+        height="400px"
       />
     </>
   );

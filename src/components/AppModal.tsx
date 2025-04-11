@@ -11,7 +11,7 @@ interface AppModalProps {
   height?: string;
 }
 
-export function AppModal({ isOpen, onClose, title, url, width = '800px', height = '600px' }: AppModalProps) {
+export function AppModal({ isOpen, onClose, title, url, width = '600px', height = '400px' }: AppModalProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export function AppModal({ isOpen, onClose, title, url, width = '800px', height 
             ref={iframeRef}
             src={url}
             className="absolute inset-0 w-full h-full"
-            style={{ border: 'none' }}
+            style={{ border: 'none', transform: 'scale(0.9)', transformOrigin: 'top center' }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
           />
