@@ -52,7 +52,8 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
         if (event.source && 'postMessage' in event.source) {
           (event.source as Window).postMessage({
             type: 'AUTH_STATUS',
-            token
+            token,
+            uid: auth.currentUser?.uid
           }, event.origin);
         }
       }
@@ -66,7 +67,8 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
           const token = await auth.currentUser.getIdToken();
           iframeRef.current.contentWindow.postMessage({
             type: 'FIREBASE_TOKEN',
-            token
+            token,
+            uid: auth.currentUser.uid
           }, new URL(url).origin);
         } catch (error) {
           console.error('Erreur lors de l\'envoi du token:', error);

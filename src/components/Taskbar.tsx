@@ -14,7 +14,7 @@ export function Taskbar({ minimizedApps, onRestore }: TaskbarProps) {
   if (minimizedApps.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-gray-800/90 backdrop-blur-sm p-2 rounded-lg border border-gray-700">
+    <div className="fixed bottom-4 left-4 flex items-center gap-2 bg-gray-800/90 backdrop-blur-sm p-2 rounded-lg border border-gray-700" style={{ maxWidth: 'calc(100% - 500px)' }}>
       {minimizedApps.map((app) => (
         <button
           key={app.id}

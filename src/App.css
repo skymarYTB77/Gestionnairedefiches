@@ -608,7 +608,7 @@ tr.selected-row {
   gap: 15px;
   margin-top: 10px;
   transition: all 0.3s ease;
-  padding-right: var(--sidebar-width);
+  padding-right: 0;
 }
 
 .app-wrapper.sidebar-closed .action-buttons {
@@ -976,7 +976,8 @@ tr.selected-row {
 }
 
 .save-note {
-  background: linear-gradient(-45deg, #667eea, #764ba2, #2193b0, #6dd5ed);
+  background: linear-gradient(-45deg, #667eea, #764ba2, #2193b0, #6d
+d5ed);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
   color: white;
