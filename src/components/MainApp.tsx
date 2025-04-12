@@ -243,7 +243,7 @@ function MainApp({ isSidebarOpen, isModalOpen }: MainAppProps) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const text = e.target?.result as string;
         const rows = text.split('\n');
@@ -253,7 +253,7 @@ function MainApp({ isSidebarOpen, isModalOpen }: MainAppProps) {
           .filter(row => row.trim())
           .map(row => {
             const values = row.split(';');
-            const restaurant: Partial<Restaurant> = {
+            const restaurant: any = {
               status: 'visible' as const,
               category: currentCategory
             };
@@ -264,7 +264,7 @@ function MainApp({ isSidebarOpen, isModalOpen }: MainAppProps) {
               }
             });
 
-            return restaurant as Restaurant;
+            return restaurant;
           });
 
         if (importedData.length > 0) {
@@ -568,7 +568,6 @@ function MainApp({ isSidebarOpen, isModalOpen }: MainAppProps) {
           appointments={appointments}
           tasks={[]}
           onImport={handleGlobalImport}
-          isHidden={isSidebarOpen || isModalOpen}
         />
       </div>
 
