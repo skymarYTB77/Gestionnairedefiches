@@ -16,6 +16,7 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { AppModal } from './AppModal';
+import { Taskbar } from './Taskbar';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -24,51 +25,90 @@ interface SidebarProps {
   onModalClose: () => void;
 }
 
+interface AppWindow {
+  id: string;
+  type: 'tasks' | 'bookmarks';
+  title: string;
+  url: string;
+  isOpen: boolean;
+  isMinimized: boolean;
+  zIndex: number;
+}
+
 export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: SidebarProps) {
   const { visibleData, acceptedData, rejectedData } = useSelector(
     (state: RootState) => state.restaurants
   );
 
-  const [showTaskManager, setShowTaskManager] = useState(false);
-  const [showBookmarks, setShowBookmarks] = useState(false);
-
-  const handleOpenTaskManager = () => {
-    setShowTaskManager(true);
-    onModalOpen();
-  };
-
-  const handleCloseTaskManager = () => {
-    setShowTaskManager(false);
-    onModalClose();
-  };
-
-  const handleOpenBookmarks = () => {
-    setShowBookmarks(true);
-    onModalOpen();
-  };
-
-  const handleCloseBookmarks = () => {
-    setShowBookmarks(false);
-    onModalClose();
-  };
-
-  const recentActivities = [
+  const [windows, setWindows] = useState<AppWindow[]>([
     {
-      icon: <Plus size={14} />,
-      title: "Nouvelle fiche ajoutée",
-      time: "Il y a 5 min"
+      id: 'tasks',
+      type: 'tasks',
+      title: 'Gestionnaire de tâches',
+      url: 'https://gestionnairedetaches.netlify.app/',
+      isOpen: false,
+      isMinimized: false,
+      zIndex: 50
     },
     {
-      icon: <Star size={14} />,
-      title: "Fiche mise à jour",
-      time: "Il y a 15 min"
-    },
-    {
-      icon: <Users size={14} />,
-      title: "3 fiches acceptées",
-      time: "Il y a 30 min"
+      id: 'bookmarks',
+      type: 'bookmarks',
+      title: 'Signets',
+      url: 'https://signets.netlify.app/',
+      isOpen: false,
+      isMinimized: false,
+      zIndex: 50
     }
-  ];
+  ]);
+
+  const handleOpenWindow = (id: string) => {
+    setWindows(prev => prev.map(window => {
+      if (window.id === id) {
+        return { ...window, isOpen: true, isMinimized: false, zIndex: Math.max(...prev.map(w => w.zIndex)) + 1 };
+      }
+      return window;
+    }));
+    onModalOpen();
+  };
+
+  const handleCloseWindow = (id: string) => {
+    setWindows(prev => prev.map(window => 
+      window.id === id ? { ...window, isOpen: false, isMinimized: false } : window
+    ));
+    if (!windows.some(w => w.isOpen && w.id !== id)) {
+      onModalClose();
+    }
+  };
+
+  const handleMinimizeWindow = (id: string) => {
+    setWindows(prev => prev.map(window =>
+      window.id === id ? { ...window, isMinimized: true } : window
+    ));
+  };
+
+  const handleRestoreWindow = (id: string) => {
+    setWindows(prev => prev.map(window => {
+      if (window.id === id) {
+        return { ...window, isMinimized: false, zIndex: Math.max(...prev.map(w => w.zIndex)) + 1 };
+      }
+      return window;
+    }));
+  };
+
+  const handleFocusWindow = (id: string) => {
+    setWindows(prev => prev.map(window => {
+      if (window.id === id) {
+        return { ...window, zIndex: Math.max(...prev.map(w => w.zIndex)) + 1 };
+      }
+      return window;
+    }));
+  };
+
+  const minimizedApps = windows.filter(w => w.isMinimized).map(w => ({
+    id: w.id,
+    title: w.title,
+    type: w.type
+  }));
 
   return (
     <>
@@ -105,35 +145,18 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: Sidebar
         </div>
 
         <div className="sidebar-section">
-          <h3>Activité récente</h3>
-          <div className="recent-activity">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="activity-item">
-                <div className="activity-icon">
-                  {activity.icon}
-                </div>
-                <div className="activity-content">
-                  <div className="activity-title">{activity.title}</div>
-                  <div className="activity-time">{activity.time}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="sidebar-section">
           <h3>Applications</h3>
           <div className="quick-actions">
             <button 
               className="quick-action-button"
-              onClick={handleOpenTaskManager}
+              onClick={() => handleOpenWindow('tasks')}
             >
               <CheckSquare size={16} />
               <span>Gestionnaire de tâches</span>
             </button>
             <button 
               className="quick-action-button"
-              onClick={handleOpenBookmarks}
+              onClick={() => handleOpenWindow('bookmarks')}
             >
               <Bookmark size={16} />
               <span>Signets</span>
@@ -142,16 +165,22 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: Sidebar
         </div>
       </div>
 
-      <AppModal
-        isOpen={showTaskManager}
-        onClose={handleCloseTaskManager}
-        url="https://gestionnairedetaches.netlify.app/"
-      />
+      {windows.map(window => (
+        <AppModal
+          key={window.id}
+          isOpen={window.isOpen && !window.isMinimized}
+          onClose={() => handleCloseWindow(window.id)}
+          onMinimize={() => handleMinimizeWindow(window.id)}
+          url={window.url}
+          title={window.title}
+          zIndex={window.zIndex}
+          onFocus={() => handleFocusWindow(window.id)}
+        />
+      ))}
 
-      <AppModal
-        isOpen={showBookmarks}
-        onClose={handleCloseBookmarks}
-        url="https://signets.netlify.app/"
+      <Taskbar
+        minimizedApps={minimizedApps}
+        onRestore={handleRestoreWindow}
       />
     </>
   );
