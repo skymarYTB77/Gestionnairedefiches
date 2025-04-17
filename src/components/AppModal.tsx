@@ -43,7 +43,8 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
 
     const handleMessage = async (event: MessageEvent) => {
       if (event.origin !== 'https://gestionnairedetaches.netlify.app' && 
-          event.origin !== 'https://signets.netlify.app') {
+          event.origin !== 'https://signets.netlify.app' &&
+          event.origin !== 'https://generateur-identite.netlify.app') {
         return;
       }
 
@@ -188,6 +189,7 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
 
   if (!isOpen) return null;
 
+  const isIdentityApp = url === 'https://generateur-identite.netlify.app/';
   const isBookmarksApp = url === 'https://signets.netlify.app/';
 
   return (
@@ -228,17 +230,22 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
             </button>
           </div>
         </div>
-        <iframe
-          ref={iframeRef}
-          src={url}
-          className="w-full h-full bg-[#1a1b1e] rounded-lg shadow-xl"
-          style={{ 
-            border: 'none',
-            pointerEvents: dragState.current.isDragging ? 'none' : 'auto'
-          }}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
-        />
+        <div className="w-full h-full bg-[#1a1b1e] rounded-lg shadow-xl overflow-hidden" style={{ paddingTop: '40px' }}>
+          <iframe
+            ref={iframeRef}
+            src={url}
+            className="w-full h-full"
+            style={{ 
+              border: 'none',
+              pointerEvents: dragState.current.isDragging ? 'none' : 'auto',
+              transform: isIdentityApp ? 'scale(0.85)' : 'none',
+              transformOrigin: 'top center',
+              height: isIdentityApp ? 'calc(100% + 80px)' : '100%'
+            }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+          />
+        </div>
       </div>
     </div>
   );
