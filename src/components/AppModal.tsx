@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Minus } from 'lucide-react';
+import { X, Minus, ExternalLink } from 'lucide-react';
 import { auth } from '../lib/firebase';
 
 interface AppModalProps {
@@ -29,6 +29,7 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
   const modalRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+  const [isLoading, setIsLoading] = useState(true);
   const dragState = useRef<DragState>({
     isDragging: false,
     startX: 0,
@@ -79,7 +80,10 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
 
     const iframe = iframeRef.current;
     if (iframe) {
-      iframe.onload = sendInitialToken;
+      iframe.onload = () => {
+        sendInitialToken();
+        setIsLoading(false);
+      };
     }
 
     // Centrer la fenêtre initialement
@@ -214,6 +218,16 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
         >
           <span className="text-white/80 flex-1 text-sm">{title}</span>
           <div className="window-controls flex items-center gap-2">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/80 hover:text-white bg-black/50 hover:bg-black/70 rounded-full p-1.5 transition-all"
+              aria-label="Ouvrir dans un nouvel onglet"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink size={16} />
+            </a>
             <button
               onClick={onMinimize}
               className="text-white/80 hover:text-white bg-black/50 hover:bg-black/70 rounded-full p-1.5 transition-all"
@@ -231,6 +245,11 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
           </div>
         </div>
         <div className="w-full h-full bg-[#1a1b1e] rounded-lg shadow-xl overflow-hidden" style={{ paddingTop: '40px' }}>
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
           <iframe
             ref={iframeRef}
             src={url}
@@ -238,9 +257,11 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
             style={{ 
               border: 'none',
               pointerEvents: dragState.current.isDragging ? 'none' : 'auto',
-              transform: isIdentityApp ? 'scale(0.85)' : 'none',
+              transform: isIdentityApp ? 'scale(0.75)' : 'none',
               transformOrigin: 'top center',
-              height: isIdentityApp ? 'calc(100% + 80px)' : '100%'
+              height: isIdentityApp ? 'calc(100% + 120px)' : '100%',
+              opacity: isLoading ? 0 : 1,
+              transition: 'opacity 0.3s ease'
             }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
