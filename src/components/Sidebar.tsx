@@ -11,7 +11,8 @@ import {
   Star,
   Users,
   CheckSquare,
-  Bookmark
+  Bookmark,
+  UserSquare2
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
@@ -27,7 +28,7 @@ interface SidebarProps {
 
 interface AppWindow {
   id: string;
-  type: 'tasks' | 'bookmarks';
+  type: 'tasks' | 'bookmarks' | 'identity';
   title: string;
   url: string;
   isOpen: boolean;
@@ -55,6 +56,15 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: Sidebar
       type: 'bookmarks',
       title: 'Signets',
       url: 'https://signets.netlify.app/',
+      isOpen: false,
+      isMinimized: false,
+      zIndex: 50
+    },
+    {
+      id: 'identity',
+      type: 'identity',
+      title: 'Générateur d\'identité',
+      url: 'https://generateur-identite.netlify.app/',
       isOpen: false,
       isMinimized: false,
       zIndex: 50
@@ -160,6 +170,13 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: Sidebar
             >
               <Bookmark size={16} />
               <span>Signets</span>
+            </button>
+            <button 
+              className="quick-action-button"
+              onClick={() => handleOpenWindow('identity')}
+            >
+              <UserSquare2 size={16} />
+              <span>Générateur d'identité</span>
             </button>
           </div>
         </div>
