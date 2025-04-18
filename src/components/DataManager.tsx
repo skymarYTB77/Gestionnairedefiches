@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Download, Upload, FileJson, FileArchive, ChevronDown, Trash2, ChevronRight } from 'lucide-react';
+import { Download, Upload, FileJson, FileArchive, ChevronDown, Trash2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { exportGlobalData, importGlobalData, type GlobalData } from '../utils/dataExport';
 import { importRestaurants } from '../store/restaurantSlice';
 import '../styles/DataManager.css';
@@ -29,7 +29,7 @@ export function DataManager({
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const exportButtonRef = useRef<HTMLButtonElement>(null);
   const importButtonRef = useRef<HTMLLabelElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
@@ -182,7 +182,7 @@ export function DataManager({
         className={`data-manager-toggle ${!isSidebarOpen ? 'closed' : ''}`}
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
-        <ChevronRight size={20} />
+        {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
       </button>
 
       <div className={`data-manager-sidebar ${!isSidebarOpen ? 'closed' : ''}`}>

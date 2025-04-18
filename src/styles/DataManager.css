@@ -5,7 +5,7 @@
   transform: translateY(-50%);
   width: 24px;
   height: 60px;
-  background: var(--card-bg);
+  background: rgba(23, 25, 35, 0.8);
   border: none;
   border-radius: 0 4px 4px 0;
   color: white;
@@ -15,6 +15,9 @@
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 101;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: none;
 }
 
 .data-manager-toggle.closed {
