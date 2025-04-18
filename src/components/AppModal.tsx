@@ -86,7 +86,7 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
       };
     }
 
-    // Centrer la fenêtre initialement
+    // Center the window initially
     if (modalRef.current) {
       const rect = modalRef.current.getBoundingClientRect();
       setPosition({
@@ -193,8 +193,8 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
 
   if (!isOpen) return null;
 
-  const isIdentityApp = url === 'https://generateur-identite.netlify.app/';
   const isBookmarksApp = url === 'https://signets.netlify.app/';
+  const isIdentityApp = url === 'https://generateur-identite.netlify.app/';
 
   return (
     <div 
@@ -207,8 +207,10 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
         className="absolute"
         style={{
           transform: `translate(${position.x}px, ${position.y}px)`,
-          width: isBookmarksApp ? '800px' : '800px',
-          height: isBookmarksApp ? '600px' : '600px'
+          width: '100%',
+          maxWidth: '800px',
+          height: '600px',
+          maxHeight: '80vh'
         }}
       >
         <div 
