@@ -1,35 +1,57 @@
-.fixed-bottom-buttons {
+.data-manager-toggle {
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  width: 100%;
-  max-width: 800px;
-  padding: 0 20px;
-  transition: all 0.3s ease;
-  padding-right: calc(20px + var(--sidebar-width));
-}
-
-.app-wrapper.sidebar-closed .fixed-bottom-buttons {
-  padding-right: 20px;
-}
-
-.button-container {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 60px;
+  background: var(--card-bg);
+  border: none;
+  border-radius: 0 4px 4px 0;
+  color: white;
+  cursor: pointer;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 20px;
-  background: rgba(23, 25, 35, 0.8);
+  transition: all 0.3s ease;
+  z-index: 101;
+}
+
+.data-manager-toggle.closed {
+  left: 300px;
+}
+
+.data-manager-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.data-manager-sidebar {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 300px;
+  background: var(--card-bg);
+  border-right: var(--neon-border);
+  box-shadow: var(--neon-glow);
   padding: 20px;
-  border-radius: 12px;
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease;
+  border-radius: 0 12px 12px 0;
+  z-index: 100;
+}
+
+.data-manager-sidebar.closed {
+  transform: translate(-100%, -50%);
+}
+
+.data-manager-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .export-options,
-.import-options,
-.delete-options {
+.import-options {
   position: relative;
 }
 
@@ -39,14 +61,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 8px 12px;
   border: none;
   border-radius: 8px;
   color: white;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.3s;
-  min-width: 160px;
+  width: 100%;
   justify-content: center;
 }
 
@@ -72,10 +94,10 @@
 .export-menu,
 .import-menu {
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 0;
   right: 0;
-  margin-bottom: 10px;
+  margin-top: 10px;
   background: var(--card-bg);
   border: 1px solid var(--glass-border);
   border-radius: 6px;
@@ -83,16 +105,15 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 200px;
   backdrop-filter: blur(10px);
-  animation: slideUp 0.2s ease-out;
+  animation: slideDown 0.2s ease-out;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes slideUp {
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -201,18 +222,19 @@
 }
 
 @media (max-width: 768px) {
-  .button-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .export-button,
-  .import-button,
-  .delete-all-button {
+  .data-manager-sidebar {
     width: 100%;
+    top: auto;
+    bottom: 0;
+    transform: translateY(0);
+    border-radius: 12px 12px 0 0;
   }
 
-  .fixed-bottom-buttons {
-    padding-right: 20px;
+  .data-manager-sidebar.closed {
+    transform: translateY(100%);
+  }
+
+  .data-manager-toggle {
+    display: none;
   }
 }

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Download, Upload, FileJson, FileArchive, ChevronDown, Trash2 } from 'lucide-react';
+import { Download, Upload, FileJson, FileArchive, ChevronDown, Trash2, ChevronRight } from 'lucide-react';
 import { exportGlobalData, importGlobalData, type GlobalData } from '../utils/dataExport';
 import { importRestaurants } from '../store/restaurantSlice';
 import '../styles/DataManager.css';
@@ -29,6 +29,7 @@ export function DataManager({
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const exportButtonRef = useRef<HTMLButtonElement>(null);
   const importButtonRef = useRef<HTMLLabelElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
@@ -176,77 +177,86 @@ export function DataManager({
   if (isHidden) return null;
 
   return (
-    <div className="fixed-bottom-buttons">
-      <div className="button-container">
-        <button 
-          className="delete-all-button"
-          onClick={() => setShowDeleteConfirmation(true)}
-        >
-          <Trash2 size={16} />
-          <span>Supprimer tout</span>
-        </button>
+    <>
+      <button 
+        className={`data-manager-toggle ${!isSidebarOpen ? 'closed' : ''}`}
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        <ChevronRight size={20} />
+      </button>
 
-        <div className="export-options">
+      <div className={`data-manager-sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
+        <div className="data-manager-content">
           <button 
-            ref={exportButtonRef}
-            className="export-button"
-            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="delete-all-button"
+            onClick={() => setShowDeleteConfirmation(true)}
           >
-            <Download size={16} />
-            <span>Exporter</span>
-            <ChevronDown size={16} />
+            <Trash2 size={16} />
+            <span>Supprimer tout</span>
           </button>
-          {showExportMenu && (
-            <div ref={exportMenuRef} className="export-menu">
-              <button onClick={handleExportCsv} className="menu-item">
-                <FileJson size={16} />
-                <span>Exporter en CSV</span>
-              </button>
-              <button onClick={handleExportZip} className="menu-item">
-                <FileArchive size={16} />
-                <span>Exporter tout (ZIP)</span>
-              </button>
-            </div>
-          )}
-        </div>
 
-        <div className="import-options">
-          <button
-            ref={importButtonRef as React.RefObject<HTMLButtonElement>}
-            className="import-button"
-            onClick={() => setShowImportMenu(!showImportMenu)}
-          >
-            <Upload size={16} />
-            <span>Importer</span>
-            <ChevronDown size={16} />
-          </button>
-          {showImportMenu && (
-            <div ref={importMenuRef} className="import-menu">
-              <input
-                type="file"
-                id="import-csv"
-                accept=".csv"
-                onChange={handleImportCsv}
-                style={{ display: 'none' }}
-              />
-              <label htmlFor="import-csv" className="menu-item">
-                <FileJson size={16} />
-                <span>Importer CSV</span>
-              </label>
+          <div className="export-options">
+            <button 
+              ref={exportButtonRef}
+              className="export-button"
+              onClick={() => setShowExportMenu(!showExportMenu)}
+            >
+              <Download size={16} />
+              <span>Exporter</span>
+              <ChevronDown size={16} />
+            </button>
+            {showExportMenu && (
+              <div ref={exportMenuRef} className="export-menu">
+                <button onClick={handleExportCsv} className="menu-item">
+                  <FileJson size={16} />
+                  <span>Exporter en CSV</span>
+                </button>
+                <button onClick={handleExportZip} className="menu-item">
+                  <FileArchive size={16} />
+                  <span>Exporter tout (ZIP)</span>
+                </button>
+              </div>
+            )}
+          </div>
 
-              <input
-                type="file"
-                id="import-zip"
-                accept=".zip"
-                onChange={handleImportZip}
-                style={{ display: 'none' }}
-              />
-              <label htmlFor="import-zip" className="menu-item">
-                <FileArchive size={16} />
-                <span>Importer ZIP</span>
-              </label>
-            </div>
-          )}
+          <div className="import-options">
+            <button
+              ref={importButtonRef as React.RefObject<HTMLButtonElement>}
+              className="import-button"
+              onClick={() => setShowImportMenu(!showImportMenu)}
+            >
+              <Upload size={16} />
+              <span>Importer</span>
+              <ChevronDown size={16} />
+            </button>
+            {showImportMenu && (
+              <div ref={importMenuRef} className="import-menu">
+                <input
+                  type="file"
+                  id="import-csv"
+                  accept=".csv"
+                  onChange={handleImportCsv}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="import-csv" className="menu-item">
+                  <FileJson size={16} />
+                  <span>Importer CSV</span>
+                </label>
+
+                <input
+                  type="file"
+                  id="import-zip"
+                  accept=".zip"
+                  onChange={handleImportZip}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="import-zip" className="menu-item">
+                  <FileArchive size={16} />
+                  <span>Importer ZIP</span>
+                </label>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -287,6 +297,6 @@ export function DataManager({
           {message}
         </div>
       )}
-    </div>
+    </>
   );
 }
