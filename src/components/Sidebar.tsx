@@ -36,42 +36,47 @@ interface AppWindow {
   isOpen: boolean;
   isMinimized: boolean;
   zIndex: number;
+  canBeFavorited?: boolean;
 }
+
+const ALL_APPS = [
+  {
+    id: 'tasks',
+    type: 'tasks',
+    title: 'Gestionnaire de tâches',
+    url: 'https://gestionnairedetaches.netlify.app/',
+    icon: CheckSquare,
+    canBeFavorited: false
+  },
+  {
+    id: 'bookmarks',
+    type: 'bookmarks',
+    title: 'Signets',
+    url: 'https://signets.netlify.app/',
+    icon: Bookmark,
+    canBeFavorited: false
+  },
+  {
+    id: 'identity',
+    type: 'identity',
+    title: 'Générateur d\'identité',
+    url: 'https://generateur-identite.netlify.app/',
+    icon: UserSquare2,
+    canBeFavorited: true
+  }
+];
 
 export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleFavorite, favorites }: SidebarProps) {
   const { visibleData, acceptedData, rejectedData } = useSelector(
     (state: RootState) => state.restaurants
   );
 
-  const [windows, setWindows] = useState<AppWindow[]>([
-    {
-      id: 'tasks',
-      type: 'tasks',
-      title: 'Gestionnaire de tâches',
-      url: 'https://gestionnairedetaches.netlify.app/',
-      isOpen: false,
-      isMinimized: false,
-      zIndex: 50
-    },
-    {
-      id: 'bookmarks',
-      type: 'bookmarks',
-      title: 'Signets',
-      url: 'https://signets.netlify.app/',
-      isOpen: false,
-      isMinimized: false,
-      zIndex: 50
-    },
-    {
-      id: 'identity',
-      type: 'identity',
-      title: 'Générateur d\'identité',
-      url: 'https://generateur-identite.netlify.app/',
-      isOpen: false,
-      isMinimized: false,
-      zIndex: 50
-    }
-  ]);
+  const [windows, setWindows] = useState<AppWindow[]>(ALL_APPS.map(app => ({
+    ...app,
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 50
+  })));
 
   const handleOpenWindow = (id: string) => {
     setWindows(prev => prev.map(window => {
@@ -159,54 +164,27 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleF
         <div className="sidebar-section">
           <h3>Applications</h3>
           <div className="quick-actions">
-            <button 
-              className="quick-action-button group relative"
-              onClick={() => handleOpenWindow('tasks')}
-            >
-              <CheckSquare size={16} />
-              <span>Gestionnaire de tâches</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite('tasks');
-                }}
-                className="opacity-0 group-hover:opacity-100 absolute right-2 text-yellow-400 hover:text-yellow-300 transition-opacity"
+            {ALL_APPS.map(app => (
+              <button 
+                key={app.id}
+                className="quick-action-button group relative"
+                onClick={() => handleOpenWindow(app.id)}
               >
-                <Star size={16} fill={favorites.includes('tasks') ? 'currentColor' : 'none'} />
+                <app.icon size={16} />
+                <span>{app.title}</span>
+                {app.canBeFavorited && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleFavorite(app.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 absolute right-2 text-yellow-400 hover:text-yellow-300 transition-opacity"
+                  >
+                    <Star size={16} fill={favorites.includes(app.id) ? 'currentColor' : 'none'} />
+                  </button>
+                )}
               </button>
-            </button>
-            <button 
-              className="quick-action-button group relative"
-              onClick={() => handleOpenWindow('bookmarks')}
-            >
-              <Bookmark size={16} />
-              <span>Signets</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite('bookmarks');
-                }}
-                className="opacity-0 group-hover:opacity-100 absolute right-2 text-yellow-400 hover:text-yellow-300 transition-opacity"
-              >
-                <Star size={16} fill={favorites.includes('bookmarks') ? 'currentColor' : 'none'} />
-              </button>
-            </button>
-            <button 
-              className="quick-action-button group relative"
-              onClick={() => handleOpenWindow('identity')}
-            >
-              <UserSquare2 size={16} />
-              <span>Générateur d'identité</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite('identity');
-                }}
-                className="opacity-0 group-hover:opacity-100 absolute right-2 text-yellow-400 hover:text-yellow-300 transition-opacity"
-              >
-                <Star size={16} fill={favorites.includes('identity') ? 'currentColor' : 'none'} />
-              </button>
-            </button>
+            ))}
           </div>
         </div>
       </div>

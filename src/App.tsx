@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from './lib/firebase';
+import { auth, db } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, onSnapshot, addDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { LoginPage } from './components/LoginPage';
 import MainApp from './components/MainApp';
 import { Sidebar } from './components/Sidebar';
@@ -17,6 +18,20 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
+      if (user) {
+        // Subscribe to favorites
+        const favoritesRef = collection(db, 'favorites');
+        const q = query(favoritesRef, where('userId', '==', user.uid));
+        
+        const unsubscribeFavorites = onSnapshot(q, (snapshot) => {
+          const favs = snapshot.docs.map(doc => doc.data().appId);
+          setFavorites(favs);
+        });
+
+        return () => {
+          unsubscribeFavorites();
+        };
+      }
     });
 
     return () => unsubscribe();
@@ -26,12 +41,30 @@ function App() {
     setActiveApp(prev => prev === appId ? null : appId);
   };
 
-  const handleToggleFavorite = (appId: string) => {
-    setFavorites(prev => 
-      prev.includes(appId) 
-        ? prev.filter(id => id !== appId)
-        : [...prev, appId]
+  const handleToggleFavorite = async (appId: string) => {
+    if (!auth.currentUser) return;
+
+    const favoritesRef = collection(db, 'favorites');
+    const q = query(
+      favoritesRef, 
+      where('userId', '==', auth.currentUser.uid),
+      where('appId', '==', appId)
     );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      // Add to favorites
+      await addDoc(favoritesRef, {
+        userId: auth.currentUser.uid,
+        appId,
+        createdAt: new Date()
+      });
+    } else {
+      // Remove from favorites
+      const docToDelete = querySnapshot.docs[0];
+      await deleteDoc(docToDelete.ref);
+    }
   };
 
   if (isAuthenticated === null) {

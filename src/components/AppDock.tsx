@@ -10,9 +10,12 @@ interface AppDockProps {
 
 export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: AppDockProps) {
   const apps = [
-    { id: 'bookmarks', icon: Bookmark, label: 'Signets' },
-    { id: 'tasks', icon: CheckSquare, label: 'Tâches' },
-    { id: 'identity', icon: UserSquare2, label: 'Générateur d\'identité' }
+    { id: 'bookmarks', icon: Bookmark, label: 'Signets', canBeFavorited: false },
+    { id: 'tasks', icon: CheckSquare, label: 'Tâches', canBeFavorited: false }
+  ];
+
+  const favoritedApps = [
+    { id: 'identity', icon: UserSquare2, label: 'Générateur d\'identité', canBeFavorited: true }
   ];
 
   return (
@@ -38,7 +41,7 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
           <div className="w-px h-6 bg-gray-700" />
           <div className="flex items-center gap-2">
             {favorites.map((appId) => {
-              const app = apps.find(a => a.id === appId);
+              const app = favoritedApps.find(a => a.id === appId);
               if (!app) return null;
               
               return (
