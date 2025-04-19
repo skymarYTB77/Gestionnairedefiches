@@ -76,8 +76,8 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
     if (modalRef.current) {
       const rect = modalRef.current.getBoundingClientRect();
       setPosition({
-        x: (window.innerWidth - rect.width) / 2,
-        y: (window.innerHeight - rect.height) / 2
+        x: (window.innerWidth - 800) / 2,
+        y: (window.innerHeight - 600) / 2
       });
     }
 
@@ -142,10 +142,8 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
         className="absolute"
         style={{
           transform: `translate(${position.x}px, ${position.y}px)`,
-          width: '100%',
-          maxWidth: '800px',
-          height: '600px',
-          maxHeight: '80vh'
+          width: '800px',
+          height: '600px'
         }}
       >
         <div 
