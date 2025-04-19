@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark, CheckSquare, Star } from 'lucide-react';
+import { Bookmark, CheckSquare, UserSquare2 } from 'lucide-react';
 
 interface AppDockProps {
   activeApp: string | null;
@@ -11,7 +11,8 @@ interface AppDockProps {
 export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: AppDockProps) {
   const apps = [
     { id: 'bookmarks', icon: Bookmark, label: 'Signets' },
-    { id: 'tasks', icon: CheckSquare, label: 'Tâches' }
+    { id: 'tasks', icon: CheckSquare, label: 'Tâches' },
+    { id: 'identity', icon: UserSquare2, label: 'Générateur d\'identité' }
   ];
 
   return (

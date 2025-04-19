@@ -12,32 +12,18 @@ interface AppModalProps {
   onFocus: () => void;
 }
 
-interface Position {
-  x: number;
-  y: number;
-}
-
-interface DragState {
-  isDragging: boolean;
-  startX: number;
-  startY: number;
-  initialPosition: Position;
-}
-
 export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFocus }: AppModalProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+  const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
-  const dragState = useRef<DragState>({
+  const dragState = useRef({
     isDragging: false,
     startX: 0,
     startY: 0,
     initialPosition: { x: 0, y: 0 }
   });
-
-  const DEAD_ZONE_SIZE = 20;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -103,45 +89,11 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
     };
   }, [isOpen, url]);
 
-  const isInControlsDeadZone = (x: number, y: number): boolean => {
-    if (!headerRef.current) return false;
-    
-    const controls = headerRef.current.querySelector('.window-controls');
-    if (!controls) return false;
-
-    const rect = controls.getBoundingClientRect();
-    return (
-      x >= rect.left - DEAD_ZONE_SIZE &&
-      x <= rect.right + DEAD_ZONE_SIZE &&
-      y >= rect.top - DEAD_ZONE_SIZE &&
-      y <= rect.bottom + DEAD_ZONE_SIZE
-    );
-  };
-
-  const keepInBounds = (pos: Position): Position => {
-    if (!modalRef.current) return pos;
-
-    const rect = modalRef.current.getBoundingClientRect();
-    const maxX = window.innerWidth - rect.width;
-    const maxY = window.innerHeight - rect.height;
-
-    return {
-      x: Math.max(0, Math.min(pos.x, maxX)),
-      y: Math.max(0, Math.min(pos.y, maxY))
-    };
-  };
-
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (!headerRef.current?.contains(e.target as Node)) return;
+    
     e.preventDefault();
     onFocus();
-
-    if (!headerRef.current?.contains(e.target as Node) || 
-        (e.target as HTMLElement).closest('.window-controls')) {
-      return;
-    }
-
-    const rect = modalRef.current?.getBoundingClientRect();
-    if (!rect) return;
 
     dragState.current = {
       isDragging: true,
@@ -149,36 +101,22 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
       startY: e.clientY,
       initialPosition: position
     };
-
-    document.body.style.userSelect = 'none';
-    document.body.style.webkitUserSelect = 'none';
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!dragState.current.isDragging) return;
 
-    if (isInControlsDeadZone(e.clientX, e.clientY)) {
-      dragState.current.isDragging = false;
-      return;
-    }
-
     const deltaX = e.clientX - dragState.current.startX;
     const deltaY = e.clientY - dragState.current.startY;
 
-    const newPosition = keepInBounds({
+    setPosition({
       x: dragState.current.initialPosition.x + deltaX,
       y: dragState.current.initialPosition.y + deltaY
     });
-
-    setPosition(newPosition);
   };
 
   const handleMouseUp = () => {
-    if (dragState.current.isDragging) {
-      dragState.current.isDragging = false;
-      document.body.style.userSelect = '';
-      document.body.style.webkitUserSelect = '';
-    }
+    dragState.current.isDragging = false;
   };
 
   useEffect(() => {
@@ -192,9 +130,6 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
   }, []);
 
   if (!isOpen) return null;
-
-  const isBookmarksApp = url === 'https://signets.netlify.app/';
-  const isIdentityApp = url === 'https://generateur-identite.netlify.app/';
 
   return (
     <div 
@@ -219,7 +154,7 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
           onMouseDown={handleMouseDown}
         >
           <span className="text-white/80 flex-1 text-sm">{title}</span>
-          <div className="window-controls flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <a
               href={url}
               target="_blank"
@@ -258,15 +193,9 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
             className="w-full h-full"
             style={{ 
               border: 'none',
-              pointerEvents: dragState.current.isDragging ? 'none' : 'auto',
-              transform: isIdentityApp ? 'scale(0.75)' : 'none',
-              transformOrigin: 'top center',
-              height: isIdentityApp ? 'calc(100% + 120px)' : '100%',
               opacity: isLoading ? 0 : 1,
               transition: 'opacity 0.3s ease'
             }}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
           />
         </div>
       </div>
