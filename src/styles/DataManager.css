@@ -8,7 +8,7 @@
   background: rgba(23, 25, 35, 0.8);
   border: none;
   border-radius: 0 4px 4px 0;
-  color: white;
+  color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -21,11 +21,14 @@
 }
 
 .data-manager-toggle.closed {
-  left: 300px;
+  left: -10px;
+  background: transparent;
+  border: none;
 }
 
 .data-manager-toggle:hover {
   background: rgba(255, 255, 255, 0.15);
+  color: white;
 }
 
 .data-manager-sidebar {

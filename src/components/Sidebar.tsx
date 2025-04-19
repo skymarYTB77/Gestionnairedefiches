@@ -24,6 +24,8 @@ interface SidebarProps {
   onToggle: () => void;
   onModalOpen: () => void;
   onModalClose: () => void;
+  onToggleFavorite: (appId: string) => void;
+  favorites: string[];
 }
 
 interface AppWindow {
@@ -36,7 +38,7 @@ interface AppWindow {
   zIndex: number;
 }
 
-export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: SidebarProps) {
+export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleFavorite, favorites }: SidebarProps) {
   const { visibleData, acceptedData, rejectedData } = useSelector(
     (state: RootState) => state.restaurants
   );
@@ -158,25 +160,52 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose }: Sidebar
           <h3>Applications</h3>
           <div className="quick-actions">
             <button 
-              className="quick-action-button"
+              className="quick-action-button group relative"
               onClick={() => handleOpenWindow('tasks')}
             >
               <CheckSquare size={16} />
               <span>Gestionnaire de tâches</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite('tasks');
+                }}
+                className="opacity-0 group-hover:opacity-100 absolute right-2 text-yellow-400 hover:text-yellow-300 transition-opacity"
+              >
+                <Star size={16} fill={favorites.includes('tasks') ? 'currentColor' : 'none'} />
+              </button>
             </button>
             <button 
-              className="quick-action-button"
+              className="quick-action-button group relative"
               onClick={() => handleOpenWindow('bookmarks')}
             >
               <Bookmark size={16} />
               <span>Signets</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite('bookmarks');
+                }}
+                className="opacity-0 group-hover:opacity-100 absolute right-2 text-yellow-400 hover:text-yellow-300 transition-opacity"
+              >
+                <Star size={16} fill={favorites.includes('bookmarks') ? 'currentColor' : 'none'} />
+              </button>
             </button>
             <button 
-              className="quick-action-button"
+              className="quick-action-button group relative"
               onClick={() => handleOpenWindow('identity')}
             >
               <UserSquare2 size={16} />
               <span>Générateur d'identité</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite('identity');
+                }}
+                className="opacity-0 group-hover:opacity-100 absolute right-2 text-yellow-400 hover:text-yellow-300 transition-opacity"
+              >
+                <Star size={16} fill={favorites.includes('identity') ? 'currentColor' : 'none'} />
+              </button>
             </button>
           </div>
         </div>

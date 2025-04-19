@@ -4,12 +4,15 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { LoginPage } from './components/LoginPage';
 import MainApp from './components/MainApp';
 import { Sidebar } from './components/Sidebar';
+import { AppDock } from './components/AppDock';
 import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeApp, setActiveApp] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -18,6 +21,18 @@ function App() {
 
     return () => unsubscribe();
   }, []);
+
+  const handleAppClick = (appId: string) => {
+    setActiveApp(prev => prev === appId ? null : appId);
+  };
+
+  const handleToggleFavorite = (appId: string) => {
+    setFavorites(prev => 
+      prev.includes(appId) 
+        ? prev.filter(id => id !== appId)
+        : [...prev, appId]
+    );
+  };
 
   if (isAuthenticated === null) {
     return (
@@ -38,6 +53,14 @@ function App() {
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         onModalOpen={() => setIsModalOpen(true)}
         onModalClose={() => setIsModalOpen(false)}
+        onToggleFavorite={handleToggleFavorite}
+        favorites={favorites}
+      />
+      <AppDock
+        activeApp={activeApp}
+        onAppClick={handleAppClick}
+        favorites={favorites}
+        onToggleFavorite={handleToggleFavorite}
       />
     </div>
   ) : (
