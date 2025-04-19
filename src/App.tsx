@@ -19,7 +19,6 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
       if (user) {
-        // Subscribe to favorites
         const favoritesRef = collection(db, 'favorites');
         const q = query(favoritesRef, where('userId', '==', user.uid));
         
@@ -54,14 +53,12 @@ function App() {
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-      // Add to favorites
       await addDoc(favoritesRef, {
         userId: auth.currentUser.uid,
         appId,
         createdAt: new Date()
       });
     } else {
-      // Remove from favorites
       const docToDelete = querySnapshot.docs[0];
       await deleteDoc(docToDelete.ref);
     }

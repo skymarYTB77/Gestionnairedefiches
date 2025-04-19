@@ -17,7 +17,6 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { AppModal } from './AppModal';
-import { Taskbar } from './Taskbar';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -81,7 +80,12 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleF
   const handleOpenWindow = (id: string) => {
     setWindows(prev => prev.map(window => {
       if (window.id === id) {
-        return { ...window, isOpen: true, isMinimized: false, zIndex: Math.max(...prev.map(w => w.zIndex)) + 1 };
+        return { 
+          ...window, 
+          isOpen: true, 
+          isMinimized: false, 
+          zIndex: Math.max(...prev.map(w => w.zIndex)) + 1 
+        };
       }
       return window;
     }));
@@ -90,7 +94,7 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleF
 
   const handleCloseWindow = (id: string) => {
     setWindows(prev => prev.map(window => 
-      window.id === id ? { ...window, isOpen: false, isMinimized: false } : window
+      window.id === id ? { ...window, isOpen: false } : window
     ));
     if (!windows.some(w => w.isOpen && w.id !== id)) {
       onModalClose();
@@ -120,12 +124,6 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleF
       return window;
     }));
   };
-
-  const minimizedApps = windows.filter(w => w.isMinimized).map(w => ({
-    id: w.id,
-    title: w.title,
-    type: w.type
-  }));
 
   return (
     <>
@@ -201,11 +199,6 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleF
           onFocus={() => handleFocusWindow(window.id)}
         />
       ))}
-
-      <Taskbar
-        minimizedApps={minimizedApps}
-        onRestore={handleRestoreWindow}
-      />
     </>
   );
 }
