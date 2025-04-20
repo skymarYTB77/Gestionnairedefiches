@@ -74,7 +74,6 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
 
     // Center the window initially
     if (modalRef.current) {
-      const rect = modalRef.current.getBoundingClientRect();
       setPosition({
         x: (window.innerWidth - 800) / 2,
         y: (window.innerHeight - 600) / 2
@@ -133,18 +132,19 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
 
   return (
     <div 
-      className="fixed inset-0 bg-transparent"
-      style={{ zIndex }}
+      className="fixed"
+      style={{ 
+        top: position.y,
+        left: position.x,
+        width: '800px',
+        height: '600px',
+        zIndex
+      }}
       onClick={onFocus}
     >
       <div 
         ref={modalRef}
-        className="absolute"
-        style={{
-          transform: `translate(${position.x}px, ${position.y}px)`,
-          width: '800px',
-          height: '600px'
-        }}
+        className="relative w-full h-full"
       >
         <div 
           ref={headerRef}
@@ -192,7 +192,8 @@ export function AppModal({ isOpen, onClose, onMinimize, url, title, zIndex, onFo
             style={{ 
               border: 'none',
               opacity: isLoading ? 0 : 1,
-              transition: 'opacity 0.3s ease'
+              transition: 'opacity 0.3s ease',
+              pointerEvents: 'auto'
             }}
           />
         </div>
