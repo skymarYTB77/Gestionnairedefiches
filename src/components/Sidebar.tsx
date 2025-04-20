@@ -78,6 +78,11 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleF
   })));
 
   const handleOpenWindow = (id: string) => {
+    if (id === 'identity') {
+      window.open('https://generateur-identite.netlify.app/', '_blank');
+      return;
+    }
+
     setWindows(prev => prev.map(window => {
       if (window.id === id) {
         return { 
@@ -188,16 +193,18 @@ export function Sidebar({ isOpen, onToggle, onModalOpen, onModalClose, onToggleF
       </div>
 
       {windows.map(window => (
-        <AppModal
-          key={window.id}
-          isOpen={window.isOpen && !window.isMinimized}
-          onClose={() => handleCloseWindow(window.id)}
-          onMinimize={() => handleMinimizeWindow(window.id)}
-          url={window.url}
-          title={window.title}
-          zIndex={window.zIndex}
-          onFocus={() => handleFocusWindow(window.id)}
-        />
+        window.id !== 'identity' && (
+          <AppModal
+            key={window.id}
+            isOpen={window.isOpen && !window.isMinimized}
+            onClose={() => handleCloseWindow(window.id)}
+            onMinimize={() => handleMinimizeWindow(window.id)}
+            url={window.url}
+            title={window.title}
+            zIndex={window.zIndex}
+            onFocus={() => handleFocusWindow(window.id)}
+          />
+        )
       ))}
     </>
   );
