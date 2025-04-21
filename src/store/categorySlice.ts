@@ -7,7 +7,23 @@ interface CategoryState {
 
 const initialState: CategoryState = {
   currentCategory: 'Restaurants',
-  categories: ['Restaurants', 'Hôtels']
+  categories: [
+    'Restaurants',
+    'Hôtels',
+    'Bars',
+    'Cafés',
+    'Boutiques',
+    'Musées',
+    'Galeries',
+    'Cinémas',
+    'Théâtres',
+    'Salles de Concert',
+    'Parcs',
+    'Centres Commerciaux',
+    'Spas',
+    'Salons de Beauté',
+    'Clubs de Sport'
+  ]
 };
 
 export const categorySlice = createSlice({

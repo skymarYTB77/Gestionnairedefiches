@@ -2,7 +2,26 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCategory, addCategory } from '../store/categorySlice';
 import { RootState } from '../store/store';
-import { ChevronDown, Building2, UtensilsCrossed, Plus, X } from 'lucide-react';
+import { 
+  ChevronDown, 
+  Building2, 
+  UtensilsCrossed,
+  Beer,
+  Coffee,
+  ShoppingBag as Shopping,
+  Landmark,
+  PaintBucket,
+  Clapperboard,
+  Theater,
+  Music,
+  Trees,
+  Store,
+  Sparkles,
+  Scissors,
+  Dumbbell,
+  Plus,
+  X
+} from 'lucide-react';
 
 export function CategorySelector() {
   const dispatch = useDispatch();
@@ -45,6 +64,32 @@ export function CategorySelector() {
         return UtensilsCrossed;
       case 'Hôtels':
         return Building2;
+      case 'Bars':
+        return Beer;
+      case 'Cafés':
+        return Coffee;
+      case 'Boutiques':
+        return Shopping;
+      case 'Musées':
+        return Landmark;
+      case 'Galeries':
+        return PaintBucket;
+      case 'Cinémas':
+        return Clapperboard;
+      case 'Théâtres':
+        return Theater;
+      case 'Salles de Concert':
+        return Music;
+      case 'Parcs':
+        return Trees;
+      case 'Centres Commerciaux':
+        return Store;
+      case 'Spas':
+        return Sparkles;
+      case 'Salons de Beauté':
+        return Scissors;
+      case 'Clubs de Sport':
+        return Dumbbell;
       default:
         return Building2;
     }
@@ -67,7 +112,7 @@ export function CategorySelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50">
+        <div className="absolute top-full left-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg overflow-hidden z-[9999] max-h-[70vh] overflow-y-auto">
           {categories.map((category) => {
             const Icon = getIcon(category);
             return (
@@ -94,7 +139,7 @@ export function CategorySelector() {
       )}
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
           <div className="bg-gray-800 rounded-lg p-6 w-96">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Nouvelle base de données</h3>
