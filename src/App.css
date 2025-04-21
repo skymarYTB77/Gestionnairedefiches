@@ -21,6 +21,14 @@
                0 0 40px rgba(102, 126, 234, 0.2),
                0 0 60px rgba(118, 75, 162, 0.1);
   --sidebar-width: 350px;
+  
+  /* Z-index hierarchy */
+  --z-base: 1;
+  --z-category-selector: 9999;
+  --z-dropdown: 9998;
+  --z-modal: 1000;
+  --z-sidebar: 100;
+  --z-temporary-message: 1100;
 }
 
 /* Scrollbar styles */
@@ -115,6 +123,8 @@ body {
   backdrop-filter: blur(10px);
   border: var(--neon-border);
   box-shadow: var(--neon-glow);
+  position: relative;
+  z-index: var(--z-base);
 }
 
 .app-header h1 {
@@ -553,7 +563,7 @@ tr.selected-row {
 .classification-container {
   position: relative;
   cursor: pointer;
-  z-index: 10;
+  z-index: var(--z-dropdown);
 }
 
 .classification-value {
@@ -569,7 +579,7 @@ tr.selected-row {
 
 .classification-options {
   position: fixed;
-  z-index: 1000;
+  z-index: var(--z-dropdown);
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
@@ -669,7 +679,7 @@ tr.selected-row {
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
-  z-index: 1000;
+  z-index: var(--z-temporary-message);
   animation: fadeInOut 2s ease-in-out forwards;
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
@@ -707,7 +717,7 @@ tr.selected-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
   backdrop-filter: blur(8px);
 }
 
@@ -1039,7 +1049,7 @@ tr.selected-row {
   padding: 20px;
   transition: transform 0.3s ease;
   overflow-y: auto;
-  z-index: 100;
+  z-index: var(--z-sidebar);
 }
 
 .sidebar.closed {
@@ -1062,7 +1072,7 @@ tr.selected-row {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  z-index: 101;
+  z-index: var(--z-sidebar);
 }
 
 .sidebar-toggle.closed {

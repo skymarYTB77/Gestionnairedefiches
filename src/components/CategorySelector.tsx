@@ -98,7 +98,7 @@ export function CategorySelector() {
   const CategoryIcon = getIcon(currentCategory);
 
   return (
-    <div className="relative" ref={dropdownRef} style={{ zIndex: 50 }}>
+    <div className="relative" ref={dropdownRef} style={{ zIndex: 'var(--z-category-selector)' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 bg-[rgba(15,23,42,0.9)] rounded-lg hover:bg-[rgba(30,41,59,0.9)] transition-colors border border-[rgba(107,213,237,0.3)] hover:border-[rgba(107,213,237,0.6)]"
