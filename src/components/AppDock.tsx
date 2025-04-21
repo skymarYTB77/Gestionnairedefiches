@@ -38,36 +38,40 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
       const currentWindow = prev[appId];
       const maxZIndex = Math.max(...Object.values(prev).map(w => w.zIndex));
 
+      // Fermer toutes les autres fenêtres non minimisées
+      const updatedWindows = { ...prev };
+      Object.keys(updatedWindows).forEach(windowId => {
+        if (windowId !== appId && updatedWindows[windowId].isOpen && !updatedWindows[windowId].isMinimized) {
+          updatedWindows[windowId] = {
+            ...updatedWindows[windowId],
+            isMinimized: true
+          };
+        }
+      });
+
       if (!currentWindow?.isOpen) {
         // Ouvrir une nouvelle fenêtre
-        return {
-          ...prev,
-          [appId]: {
-            isOpen: true,
-            isMinimized: false,
-            zIndex: maxZIndex + 1
-          }
+        updatedWindows[appId] = {
+          isOpen: true,
+          isMinimized: false,
+          zIndex: maxZIndex + 1
         };
       } else if (currentWindow.isMinimized) {
         // Restaurer une fenêtre minimisée
-        return {
-          ...prev,
-          [appId]: {
-            ...currentWindow,
-            isMinimized: false,
-            zIndex: maxZIndex + 1
-          }
+        updatedWindows[appId] = {
+          ...currentWindow,
+          isMinimized: false,
+          zIndex: maxZIndex + 1
         };
       } else {
         // Minimiser une fenêtre ouverte
-        return {
-          ...prev,
-          [appId]: {
-            ...currentWindow,
-            isMinimized: true
-          }
+        updatedWindows[appId] = {
+          ...currentWindow,
+          isMinimized: true
         };
       }
+
+      return updatedWindows;
     });
     onAppClick(appId);
   };
@@ -89,27 +93,51 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
   const handleRestoreWindow = (appId: string) => {
     setWindows(prev => {
       const maxZIndex = Math.max(...Object.values(prev).map(w => w.zIndex));
-      return {
-        ...prev,
-        [appId]: {
-          ...prev[appId],
-          isMinimized: false,
-          zIndex: maxZIndex + 1
+      
+      // Minimiser toutes les autres fenêtres non minimisées
+      const updatedWindows = { ...prev };
+      Object.keys(updatedWindows).forEach(windowId => {
+        if (windowId !== appId && updatedWindows[windowId].isOpen && !updatedWindows[windowId].isMinimized) {
+          updatedWindows[windowId] = {
+            ...updatedWindows[windowId],
+            isMinimized: true
+          };
         }
+      });
+
+      // Restaurer la fenêtre sélectionnée
+      updatedWindows[appId] = {
+        ...updatedWindows[appId],
+        isMinimized: false,
+        zIndex: maxZIndex + 1
       };
+
+      return updatedWindows;
     });
   };
 
   const handleFocusWindow = (appId: string) => {
     setWindows(prev => {
       const maxZIndex = Math.max(...Object.values(prev).map(w => w.zIndex));
-      return {
-        ...prev,
-        [appId]: {
-          ...prev[appId],
-          zIndex: maxZIndex + 1
+      
+      // Minimiser toutes les autres fenêtres non minimisées
+      const updatedWindows = { ...prev };
+      Object.keys(updatedWindows).forEach(windowId => {
+        if (windowId !== appId && updatedWindows[windowId].isOpen && !updatedWindows[windowId].isMinimized) {
+          updatedWindows[windowId] = {
+            ...updatedWindows[windowId],
+            isMinimized: true
+          };
         }
+      });
+
+      // Mettre le focus sur la fenêtre sélectionnée
+      updatedWindows[appId] = {
+        ...updatedWindows[appId],
+        zIndex: maxZIndex + 1
       };
+
+      return updatedWindows;
     });
   };
 
