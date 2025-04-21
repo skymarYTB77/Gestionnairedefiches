@@ -6,20 +6,20 @@
   --delete-gradient: linear-gradient(135deg, #ff0844, #ffb199);
   --accept-gradient: linear-gradient(135deg, #00b09b, #96c93d);
   --reject-gradient: linear-gradient(135deg, #ff416c, #ff4b2b);
-  --glass-bg: rgba(255, 255, 255, 0.15);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --neon-shadow: 0 0 15px rgba(107, 213, 237, 0.3);
-  --dark-bg: #171923;
-  --card-bg: rgba(23, 25, 35, 0.95);
+  --glass-bg: rgba(15, 23, 42, 0.95);
+  --glass-border: rgba(107, 213, 237, 0.3);
+  --neon-shadow: 0 0 20px rgba(107, 213, 237, 0.3);
+  --dark-bg: rgba(15, 23, 42, 0.98);
+  --card-bg: rgba(15, 23, 42, 0.95);
   --header-height: 60px;
   --preview-height: 200px;
   --database-header-height: 80px;
-  --button-bg: rgba(255, 255, 255, 0.1);
-  --button-hover-bg: rgba(255, 255, 255, 0.2);
-  --neon-border: 2px solid #6dd5ed;
-  --neon-glow: 0 0 20px rgba(109, 213, 237, 0.5),
-               0 0 40px rgba(102, 126, 234, 0.3),
-               0 0 60px rgba(118, 75, 162, 0.2);
+  --button-bg: rgba(30, 41, 59, 0.9);
+  --button-hover-bg: rgba(30, 41, 59, 0.7);
+  --neon-border: 2px solid rgba(107, 213, 237, 0.4);
+  --neon-glow: 0 0 20px rgba(107, 213, 237, 0.3),
+               0 0 40px rgba(102, 126, 234, 0.2),
+               0 0 60px rgba(118, 75, 162, 0.1);
   --sidebar-width: 350px;
 }
 
@@ -58,16 +58,16 @@
 
 @keyframes borderGlow {
   0% {
-    border-color: rgba(107, 213, 237, 0.4);
-    box-shadow: 0 0 15px rgba(107, 213, 237, 0.2);
+    border-color: rgba(107, 213, 237, 0.2);
+    box-shadow: 0 0 15px rgba(107, 213, 237, 0.1);
   }
   50% {
-    border-color: rgba(107, 213, 237, 0.8);
-    box-shadow: 0 0 25px rgba(107, 213, 237, 0.4);
+    border-color: rgba(107, 213, 237, 0.4);
+    box-shadow: 0 0 25px rgba(107, 213, 237, 0.2);
   }
   100% {
-    border-color: rgba(107, 213, 237, 0.4);
-    box-shadow: 0 0 15px rgba(107, 213, 237, 0.2);
+    border-color: rgba(107, 213, 237, 0.2);
+    box-shadow: 0 0 15px rgba(107, 213, 237, 0.1);
   }
 }
 
@@ -75,7 +75,7 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(-45deg, #1a202c80, #2d374880, #1e3c7280, #2a529880);
+  background: linear-gradient(-45deg, #0f172a, #1e293b, #172554, #1e3a8a);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
   color: white;
@@ -111,7 +111,7 @@ body {
   align-items: center;
   padding: 0 16px;
   border-radius: 12px;
-  background: rgba(23, 25, 35, 0.8);
+  background: var(--glass-bg);
   backdrop-filter: blur(10px);
   border: var(--neon-border);
   box-shadow: var(--neon-glow);
@@ -143,7 +143,7 @@ body {
 
 .sticky-preview {
   height: var(--preview-height);
-  background: rgba(23, 25, 35, 0.8);
+  background: var(--glass-bg);
   border-radius: 12px;
   border: var(--neon-border);
   overflow: auto;
@@ -188,7 +188,7 @@ body {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   color: white;
@@ -199,7 +199,7 @@ body {
 }
 
 .preview-button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--button-hover-bg);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(107, 213, 237, 0.2);
 }
@@ -259,7 +259,7 @@ body {
 }
 
 .restaurant-field input {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 6px;
   padding: 8px;
@@ -269,7 +269,7 @@ body {
 }
 
 .restaurant-field input:focus {
-  border-color: rgba(107, 213, 237, 0.8);
+  border-color: rgba(107, 213, 237, 0.6);
   box-shadow: 0 0 15px rgba(107, 213, 237, 0.2);
   outline: none;
 }
@@ -277,7 +277,7 @@ body {
 .database-section {
   flex: 1;
   min-height: 0;
-  background: rgba(23, 25, 35, 0.8);
+  background: var(--glass-bg);
   border-radius: 15px;
   border: 1px solid var(--glass-border);
   display: flex;
@@ -316,7 +316,7 @@ body {
 }
 
 .nav-button {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 50%;
   width: 30px;
@@ -331,7 +331,7 @@ body {
 }
 
 .nav-button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--button-hover-bg);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(107, 213, 237, 0.2);
 }
@@ -346,7 +346,7 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 0 12px;
@@ -354,7 +354,7 @@ body {
 }
 
 .search-input-container:focus-within {
-  border-color: rgba(107, 213, 237, 0.8);
+  border-color: rgba(107, 213, 237, 0.6);
   box-shadow: 0 0 20px rgba(107, 213, 237, 0.2);
 }
 
@@ -408,7 +408,7 @@ td {
 }
 
 th {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--button-bg);
   font-weight: 500;
   position: sticky;
   top: 0;
@@ -506,7 +506,7 @@ tr.selected-row {
 }
 
 .note-cell input {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 4px;
   color: white;
@@ -517,7 +517,7 @@ tr.selected-row {
 
 .note-cell input:focus {
   outline: none;
-  border-color: rgba(107, 213, 237, 0.8);
+  border-color: rgba(107, 213, 237, 0.6);
   box-shadow: 0 0 15px rgba(107, 213, 237, 0.2);
 }
 
@@ -570,7 +570,7 @@ tr.selected-row {
 .classification-options {
   position: fixed;
   z-index: 1000;
-  background: rgba(23, 25, 35, 0.95);
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 4px;
@@ -619,7 +619,7 @@ tr.selected-row {
   display: flex;
   justify-content: center;
   gap: 20px;
-  background: rgba(23, 25, 35, 0.95);
+  background: var(--glass-bg);
   padding: 20px 40px;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
@@ -665,7 +665,7 @@ tr.selected-row {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(23, 25, 35, 0.95);
+  background: var(--glass-bg);
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -712,7 +712,7 @@ tr.selected-row {
 }
 
 .modal-content {
-  background: rgba(23, 25, 35, 0.95);
+  background: var(--glass-bg);
   padding: 20px;
   border-radius: 15px;
   border: 1px solid var(--glass-border);
@@ -733,12 +733,12 @@ tr.selected-row {
   transition: all 0.3s;
   padding: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--button-bg);
 }
 
 .close-modal:hover {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--button-hover-bg);
   transform: rotate(90deg);
 }
 
@@ -761,7 +761,7 @@ tr.selected-row {
 
 .custom-field-input {
   flex: 1;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 12px;
@@ -772,7 +772,7 @@ tr.selected-row {
 
 .custom-field-input:focus {
   outline: none;
-  border-color: rgba(107, 213, 237, 0.8);
+  border-color: rgba(107, 213, 237, 0.6);
   box-shadow: 0 0 20px rgba(107, 213, 237, 0.2);
 }
 
@@ -844,7 +844,7 @@ tr.selected-row {
 }
 
 .cancel-delete {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--button-bg);
   color: white;
   border: 1px solid var(--glass-border);
 }
@@ -934,7 +934,7 @@ tr.selected-row {
 
 .note-textarea {
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 12px;
@@ -948,7 +948,7 @@ tr.selected-row {
 
 .note-textarea:focus {
   outline: none;
-  border-color: rgba(107, 213, 237, 0.8);
+  border-color: rgba(107, 213, 237, 0.6);
   box-shadow: 0 0 20px rgba(107, 213, 237, 0.2);
 }
 
@@ -970,14 +970,13 @@ tr.selected-row {
 }
 
 .cancel-note {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--button-bg);
   color: white;
   border: 1px solid var(--glass-border);
 }
 
 .save-note {
-  background: linear-gradient(-45deg, #667eea, #764ba2, #2193b0, #6d
-d5ed);
+  background: linear-gradient(-45deg, #667eea, #764ba2, #2193b0, #6dd5ed);
   background-size: 300% 300%;
   animation: gradientBG 8s ease infinite;
   color: white;
@@ -998,7 +997,7 @@ d5ed);
 
 .undo-button,
 .redo-button {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--button-bg);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   width: 32px;
@@ -1014,9 +1013,9 @@ d5ed);
 
 .undo-button:hover,
 .redo-button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--button-hover-bg);
   transform: translateY(-2px);
-  box-shadow:  0 5px 15px rgba(107, 213, 237, 0.2);
+  box-shadow: 0 5px 15px rgba(107, 213, 237, 0.2);
 }
 
 .undo-button.disabled,
@@ -1071,11 +1070,11 @@ d5ed);
 }
 
 .sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--button-hover-bg);
 }
 
 .sidebar-section {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--button-bg);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;

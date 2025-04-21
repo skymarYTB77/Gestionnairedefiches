@@ -98,10 +98,10 @@ export function CategorySelector() {
   const CategoryIcon = getIcon(currentCategory);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} style={{ zIndex: 50 }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-[rgba(15,23,42,0.9)] rounded-lg hover:bg-[rgba(30,41,59,0.9)] transition-colors border border-[rgba(107,213,237,0.3)] hover:border-[rgba(107,213,237,0.6)]"
       >
         <CategoryIcon size={16} />
         <span>{currentCategory}</span>
@@ -112,15 +112,15 @@ export function CategorySelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg overflow-hidden z-[9999] max-h-[70vh] overflow-y-auto">
+        <div className="absolute top-full left-0 mt-2 w-64 bg-[rgba(15,23,42,0.95)] rounded-lg shadow-lg overflow-hidden z-[9999] max-h-[70vh] overflow-y-auto border border-[rgba(107,213,237,0.3)] backdrop-blur-md">
           {categories.map((category) => {
             const Icon = getIcon(category);
             return (
               <button
                 key={category}
                 onClick={() => handleSelect(category)}
-                className={`w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-700 transition-colors ${
-                  currentCategory === category ? 'bg-gray-700 text-blue-400' : 'text-gray-300'
+                className={`w-full flex items-center gap-2 px-4 py-3 hover:bg-[rgba(30,41,59,0.9)] transition-colors ${
+                  currentCategory === category ? 'bg-[rgba(30,41,59,0.9)] text-[#6dd5ed]' : 'text-gray-300'
                 }`}
               >
                 <Icon size={16} />
@@ -130,7 +130,7 @@ export function CategorySelector() {
           })}
           <button
             onClick={() => setShowAddModal(true)}
-            className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-700 transition-colors text-gray-300 border-t border-gray-700"
+            className="w-full flex items-center gap-2 px-4 py-3 hover:bg-[rgba(30,41,59,0.9)] transition-colors text-gray-300 border-t border-[rgba(107,213,237,0.2)]"
           >
             <Plus size={16} />
             <span>Nouvelle base de données</span>
@@ -139,8 +139,8 @@ export function CategorySelector() {
       )}
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-          <div className="bg-gray-800 rounded-lg p-6 w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] backdrop-blur-sm">
+          <div className="bg-[rgba(15,23,42,0.95)] rounded-lg p-6 w-96 border border-[rgba(107,213,237,0.3)] shadow-[0_0_20px_rgba(107,213,237,0.2)]">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Nouvelle base de données</h3>
               <button
@@ -155,19 +155,19 @@ export function CategorySelector() {
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               placeholder="Nom de la base de données"
-              className="w-full bg-gray-700 text-white rounded-md px-4 py-2 mb-4"
+              className="w-full bg-[rgba(30,41,59,0.9)] text-white rounded-md px-4 py-2 mb-4 border border-[rgba(107,213,237,0.3)] focus:border-[rgba(107,213,237,0.6)] focus:outline-none"
               autoFocus
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 rounded-md bg-gray-700 text-white hover:bg-gray-600"
+                className="px-4 py-2 rounded-md bg-[rgba(30,41,59,0.9)] text-white hover:bg-[rgba(30,41,59,0.7)] border border-[rgba(107,213,237,0.3)]"
               >
                 Annuler
               </button>
               <button
                 onClick={handleAddCategory}
-                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-[#2193b0] to-[#6dd5ed] text-white hover:brightness-110"
               >
                 Ajouter
               </button>
