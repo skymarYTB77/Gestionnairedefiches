@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCategory, addCategory } from '../store/categorySlice';
+import { setCategory, addCategory, removeCategory } from '../store/categorySlice';
 import { RootState } from '../store/store';
+import { collection, addDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { 
   ChevronDown, 
   Building2, 
@@ -20,7 +22,8 @@ import {
   Scissors,
   Dumbbell,
   Plus,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
 
 export function CategorySelector() {
@@ -30,6 +33,8 @@ export function CategorySelector() {
   const [isOpen, setIsOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCategory, setNewCategory] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,13 +53,46 @@ export function CategorySelector() {
     setIsOpen(false);
   };
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (newCategory.trim()) {
-      dispatch(addCategory(newCategory.trim()));
-      dispatch(setCategory(newCategory.trim()));
-      setNewCategory('');
-      setShowAddModal(false);
-      setIsOpen(false);
+      try {
+        // Ajouter à Firestore
+        await addDoc(collection(db, 'categories'), {
+          name: newCategory.trim(),
+          createdAt: new Date()
+        });
+
+        // Mettre à jour Redux
+        dispatch(addCategory(newCategory.trim()));
+        dispatch(setCategory(newCategory.trim()));
+        setNewCategory('');
+        setShowAddModal(false);
+        setIsOpen(false);
+      } catch (error) {
+        console.error('Erreur lors de l\'ajout de la catégorie:', error);
+      }
+    }
+  };
+
+  const handleDeleteCategory = async (categoryName: string) => {
+    try {
+      // Supprimer de Firestore
+      const categoryQuery = query(
+        collection(db, 'categories'),
+        where('name', '==', categoryName)
+      );
+      const querySnapshot = await getDocs(categoryQuery);
+      
+      querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+
+      // Mettre à jour Redux
+      dispatch(removeCategory(categoryName));
+      setShowDeleteConfirm(false);
+      setCategoryToDelete(null);
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la catégorie:', error);
     }
   };
 
@@ -116,16 +154,32 @@ export function CategorySelector() {
           {categories.map((category) => {
             const Icon = getIcon(category);
             return (
-              <button
+              <div
                 key={category}
-                onClick={() => handleSelect(category)}
-                className={`w-full flex items-center gap-2 px-4 py-3 hover:bg-[rgba(30,41,59,0.9)] transition-colors ${
+                className={`group relative flex items-center ${
                   currentCategory === category ? 'bg-[rgba(30,41,59,0.9)] text-[#6dd5ed]' : 'text-gray-300'
                 }`}
               >
-                <Icon size={16} />
-                <span>{category}</span>
-              </button>
+                <button
+                  onClick={() => handleSelect(category)}
+                  className="w-full flex items-center gap-2 px-4 py-3 hover:bg-[rgba(30,41,59,0.9)] transition-colors"
+                >
+                  <Icon size={16} />
+                  <span>{category}</span>
+                </button>
+                {categories.length > 1 && category !== currentCategory && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCategoryToDelete(category);
+                      setShowDeleteConfirm(true);
+                    }}
+                    className="absolute right-2 opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:text-red-400 transition-all"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
             );
           })}
           <button
@@ -170,6 +224,35 @@ export function CategorySelector() {
                 className="px-4 py-2 rounded-md bg-gradient-to-r from-[#2193b0] to-[#6dd5ed] text-white hover:brightness-110"
               >
                 Ajouter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && categoryToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] backdrop-blur-sm">
+          <div className="bg-[rgba(15,23,42,0.95)] rounded-lg p-6 w-96 border border-[rgba(107,213,237,0.3)] shadow-[0_0_20px_rgba(107,213,237,0.2)]">
+            <h3 className="text-lg font-semibold mb-4">Confirmer la suppression</h3>
+            <p className="text-gray-300 mb-6">
+              Êtes-vous sûr de vouloir supprimer la base de données "{categoryToDelete}" ?
+              Cette action est irréversible.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setCategoryToDelete(null);
+                }}
+                className="px-4 py-2 rounded-md bg-[rgba(30,41,59,0.9)] text-white hover:bg-[rgba(30,41,59,0.7)] border border-[rgba(107,213,237,0.3)]"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => handleDeleteCategory(categoryToDelete)}
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-red-600 to-red-400 text-white hover:brightness-110"
+              >
+                Supprimer
               </button>
             </div>
           </div>

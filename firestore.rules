@@ -19,29 +19,17 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isOwner();
     }
 
-    // Règles pour les collections de restaurants
-    match /restaurants_visible/{document} {
-      allow read, write: if isAuthenticated();
+    // Règles pour les catégories
+    match /categories/{document} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
     }
 
-    match /restaurants_accepted/{document} {
-      allow read, write: if isAuthenticated();
-    }
-
-    match /restaurants_rejected/{document} {
-      allow read, write: if isAuthenticated();
-    }
-
-    match /hotels_visible/{document} {
-      allow read, write: if isAuthenticated();
-    }
-
-    match /hotels_accepted/{document} {
-      allow read, write: if isAuthenticated();
-    }
-
-    match /hotels_rejected/{document} {
-      allow read, write: if isAuthenticated();
+    // Règles pour les collections de données
+    match /databases/{database}/documents/{category}/{type}/{document} {
+      allow read, write: if isAuthenticated() &&
+        (type == 'visible' || type == 'accepted' || type == 'rejected');
     }
 
     // Règles pour la collection apiKeys
