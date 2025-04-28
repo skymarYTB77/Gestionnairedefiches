@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, serverTimestamp, writeBatch, query, where } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, serverTimestamp, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 interface Restaurant {
@@ -56,7 +56,6 @@ const saveToHistory = (state: RestaurantState) => {
   state.future = [];
 };
 
-// Helper function to convert Firestore timestamps to ISO strings
 const convertTimestamps = (data: any): Restaurant => {
   const converted = { ...data };
   if (converted.createdAt?.toDate) {
@@ -65,7 +64,7 @@ const convertTimestamps = (data: any): Restaurant => {
   if (converted.updatedAt?.toDate) {
     converted.updatedAt = converted.updatedAt.toDate().toISOString();
   }
-  return converted as Restaurant;
+  return converted;
 };
 
 export const restaurantSlice = createSlice({
@@ -79,17 +78,17 @@ export const restaurantSlice = createSlice({
       state.error = action.payload;
     },
     setInitialData: (state, action: PayloadAction<{
-      visible: any[];
-      accepted: any[];
-      rejected: any[];
+      visible: Restaurant[];
+      accepted: Restaurant[];
+      rejected: Restaurant[];
     }>) => {
-      state.visibleData = action.payload.visible.map(convertTimestamps);
-      state.acceptedData = action.payload.accepted.map(convertTimestamps);
-      state.rejectedData = action.payload.rejected.map(convertTimestamps);
+      state.visibleData = action.payload.visible;
+      state.acceptedData = action.payload.accepted;
+      state.rejectedData = action.payload.rejected;
     },
     addRestaurantSuccess: (state, action: PayloadAction<Restaurant>) => {
       saveToHistory(state);
-      state.visibleData.push(convertTimestamps(action.payload));
+      state.visibleData.push(action.payload);
     },
     deleteRestaurantSuccess: (state, action: PayloadAction<{ id: string; database: 'visible' | 'accepted' | 'rejected' }>) => {
       saveToHistory(state);
@@ -103,14 +102,14 @@ export const restaurantSlice = createSlice({
       }
     },
     moveRestaurantSuccess: (state, action: PayloadAction<{
-      restaurant: any;
+      restaurant: Restaurant;
       fromStatus: 'visible' | 'accepted' | 'rejected';
       toStatus: 'visible' | 'accepted' | 'rejected';
     }>) => {
       saveToHistory(state);
       const { restaurant, fromStatus, toStatus } = action.payload;
-      const convertedRestaurant = convertTimestamps(restaurant);
       
+      // Remove from source
       if (fromStatus === 'visible') {
         state.visibleData = state.visibleData.filter(r => r.id !== restaurant.id);
       } else if (fromStatus === 'accepted') {
@@ -119,28 +118,34 @@ export const restaurantSlice = createSlice({
         state.rejectedData = state.rejectedData.filter(r => r.id !== restaurant.id);
       }
 
+      // Add to destination
       if (toStatus === 'visible') {
-        state.visibleData.push(convertedRestaurant);
+        state.visibleData.push(restaurant);
       } else if (toStatus === 'accepted') {
-        state.acceptedData.push(convertedRestaurant);
+        state.acceptedData.push(restaurant);
       } else {
-        state.rejectedData.push(convertedRestaurant);
+        state.rejectedData.push(restaurant);
       }
     },
     updateRestaurantSuccess: (state, action: PayloadAction<{
-      restaurant: any;
+      restaurant: Restaurant;
       database: 'visible' | 'accepted' | 'rejected';
     }>) => {
       saveToHistory(state);
       const { restaurant, database } = action.payload;
-      const convertedRestaurant = convertTimestamps(restaurant);
       
       if (database === 'visible') {
-        state.visibleData = state.visibleData.map(r => r.id === restaurant.id ? convertedRestaurant : r);
+        state.visibleData = state.visibleData.map(r => 
+          r.id === restaurant.id ? restaurant : r
+        );
       } else if (database === 'accepted') {
-        state.acceptedData = state.acceptedData.map(r => r.id === restaurant.id ? convertedRestaurant : r);
+        state.acceptedData = state.acceptedData.map(r => 
+          r.id === restaurant.id ? restaurant : r
+        );
       } else {
-        state.rejectedData = state.rejectedData.map(r => r.id === restaurant.id ? convertedRestaurant : r);
+        state.rejectedData = state.rejectedData.map(r => 
+          r.id === restaurant.id ? restaurant : r
+        );
       }
     },
     undo: (state) => {
@@ -178,6 +183,7 @@ export const restaurantSlice = createSlice({
 export const fetchRestaurants = () => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
+    console.log('Fetching restaurants...');
     
     // Fetch from all collections
     const [visibleSnapshot, acceptedSnapshot, rejectedSnapshot] = await Promise.all([
@@ -185,6 +191,10 @@ export const fetchRestaurants = () => async (dispatch: any) => {
       getDocs(collection(db, 'restaurants_accepted')),
       getDocs(collection(db, 'restaurants_rejected'))
     ]);
+
+    console.log('Raw visible snapshot:', visibleSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    console.log('Raw accepted snapshot:', acceptedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    console.log('Raw rejected snapshot:', rejectedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
     const visible = visibleSnapshot.docs.map(doc => ({
       ...doc.data(),
@@ -204,8 +214,13 @@ export const fetchRestaurants = () => async (dispatch: any) => {
       status: 'rejected'
     })) as Restaurant[];
 
+    console.log('Processed visible data:', visible);
+    console.log('Processed accepted data:', accepted);
+    console.log('Processed rejected data:', rejected);
+
     dispatch(setInitialData({ visible, accepted, rejected }));
   } catch (error) {
+    console.error('Error fetching restaurants:', error);
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
     dispatch(setLoading(false));
@@ -215,6 +230,8 @@ export const fetchRestaurants = () => async (dispatch: any) => {
 export const addRestaurant = (restaurant: Omit<Restaurant, 'id'>) => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
+    console.log('Adding restaurant:', restaurant);
+    
     const docRef = await addDoc(collection(db, 'restaurants'), {
       ...restaurant,
       status: 'visible',
@@ -222,8 +239,10 @@ export const addRestaurant = (restaurant: Omit<Restaurant, 'id'>) => async (disp
       updatedAt: serverTimestamp()
     });
     
+    console.log('Restaurant added with ID:', docRef.id);
     dispatch(addRestaurantSuccess({ ...restaurant, id: docRef.id }));
   } catch (error) {
+    console.error('Error adding restaurant:', error);
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
     dispatch(setLoading(false));
@@ -233,13 +252,17 @@ export const addRestaurant = (restaurant: Omit<Restaurant, 'id'>) => async (disp
 export const deleteRestaurant = (id: string, database: 'visible' | 'accepted' | 'rejected') => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
+    console.log('Deleting restaurant:', { id, database });
+    
     const collectionName = database === 'visible' ? 'restaurants' : 
                           database === 'accepted' ? 'restaurants_accepted' : 
                           'restaurants_rejected';
     
     await deleteDoc(doc(db, collectionName, id));
+    console.log('Restaurant deleted successfully');
     dispatch(deleteRestaurantSuccess({ id, database }));
   } catch (error) {
+    console.error('Error deleting restaurant:', error);
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
     dispatch(setLoading(false));
@@ -253,35 +276,34 @@ export const moveRestaurant = (
 ) => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
+    console.log('Moving restaurant:', { restaurant, fromStatus, toStatus });
     
-    // Delete from source collection
     const sourceCollection = fromStatus === 'visible' ? 'restaurants' :
                            fromStatus === 'accepted' ? 'restaurants_accepted' :
                            'restaurants_rejected';
     
-    // Add to destination collection
     const destCollection = toStatus === 'visible' ? 'restaurants' :
                          toStatus === 'accepted' ? 'restaurants_accepted' :
                          'restaurants_rejected';
     
     const { id, ...restaurantData } = restaurant;
     
-    // Add to new collection first
     const newDocRef = await addDoc(collection(db, destCollection), {
       ...restaurantData,
       status: toStatus,
       updatedAt: serverTimestamp()
     });
     
-    // Then delete from old collection
     await deleteDoc(doc(db, sourceCollection, id!));
     
+    console.log('Restaurant moved successfully');
     dispatch(moveRestaurantSuccess({ 
       restaurant: { ...restaurant, id: newDocRef.id, status: toStatus }, 
       fromStatus, 
       toStatus 
     }));
   } catch (error) {
+    console.error('Error moving restaurant:', error);
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
     dispatch(setLoading(false));
@@ -294,6 +316,8 @@ export const updateRestaurant = (
 ) => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
+    console.log('Updating restaurant:', { restaurant, database });
+    
     const collectionName = database === 'visible' ? 'restaurants' :
                           database === 'accepted' ? 'restaurants_accepted' :
                           'restaurants_rejected';
@@ -304,8 +328,10 @@ export const updateRestaurant = (
       updatedAt: serverTimestamp()
     });
     
+    console.log('Restaurant updated successfully');
     dispatch(updateRestaurantSuccess({ restaurant, database }));
   } catch (error) {
+    console.error('Error updating restaurant:', error);
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
     dispatch(setLoading(false));
