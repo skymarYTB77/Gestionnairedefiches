@@ -57,6 +57,12 @@ export function CategorySelector() {
 
   const handleAddCategory = async () => {
     if (newCategory.trim()) {
+      // Check if category already exists
+      if (categories.includes(newCategory.trim())) {
+        alert("Cette base de données existe déjà !");
+        return;
+      }
+      
       await dispatch(addCategoryToFirestore(newCategory.trim()));
       dispatch(setCategory(newCategory.trim()));
       setNewCategory('');
@@ -67,7 +73,7 @@ export function CategorySelector() {
 
   const handleDeleteCategory = async (categoryName: string) => {
     if (categories.length <= 1) {
-      alert("Vous ne pouvez pas supprimer la dernière catégorie !");
+      alert("Vous ne pouvez pas supprimer la dernière base de données !");
       return;
     }
     await dispatch(deleteCategoryFromFirestore(categoryName));
