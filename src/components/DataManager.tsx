@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Download, Upload, FileJson, FileArchive, ChevronDown, Trash2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { exportGlobalData, importGlobalData, type GlobalData } from '../utils/dataExport';
-import { importRestaurants } from '../store/restaurantSlice';
+import { setInitialData } from '../store/restaurantSlice';
 import '../styles/DataManager.css';
 
 interface DataManagerProps {
@@ -162,7 +162,11 @@ export function DataManager({
           });
 
         if (importedData.length > 0) {
-          await dispatch(importRestaurants(importedData));
+          dispatch(setInitialData({
+            visible: importedData,
+            accepted: [],
+            rejected: []
+          }));
           showTemporaryMessage(`${importedData.length} fiches importées depuis le CSV !`);
         }
       } catch (error) {

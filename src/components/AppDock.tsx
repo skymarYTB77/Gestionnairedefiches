@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { CheckSquare, Bookmark, UserSquare2 } from 'lucide-react';
 import { AppModal } from './AppModal';
-import { Taskbar } from './Taskbar';
 
 interface AppDockProps {
   activeApp: string | null;
@@ -38,7 +37,6 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
       const currentWindow = prev[appId];
       const maxZIndex = Math.max(...Object.values(prev).map(w => w.zIndex));
 
-      // Fermer toutes les autres fenêtres non minimisées
       const updatedWindows = { ...prev };
       Object.keys(updatedWindows).forEach(windowId => {
         if (windowId !== appId && updatedWindows[windowId].isOpen && !updatedWindows[windowId].isMinimized) {
@@ -50,21 +48,18 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
       });
 
       if (!currentWindow?.isOpen) {
-        // Ouvrir une nouvelle fenêtre
         updatedWindows[appId] = {
           isOpen: true,
           isMinimized: false,
           zIndex: maxZIndex + 1
         };
       } else if (currentWindow.isMinimized) {
-        // Restaurer une fenêtre minimisée
         updatedWindows[appId] = {
           ...currentWindow,
           isMinimized: false,
           zIndex: maxZIndex + 1
         };
       } else {
-        // Minimiser une fenêtre ouverte
         updatedWindows[appId] = {
           ...currentWindow,
           isMinimized: true
@@ -90,37 +85,10 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
     }));
   };
 
-  const handleRestoreWindow = (appId: string) => {
-    setWindows(prev => {
-      const maxZIndex = Math.max(...Object.values(prev).map(w => w.zIndex));
-      
-      // Minimiser toutes les autres fenêtres non minimisées
-      const updatedWindows = { ...prev };
-      Object.keys(updatedWindows).forEach(windowId => {
-        if (windowId !== appId && updatedWindows[windowId].isOpen && !updatedWindows[windowId].isMinimized) {
-          updatedWindows[windowId] = {
-            ...updatedWindows[windowId],
-            isMinimized: true
-          };
-        }
-      });
-
-      // Restaurer la fenêtre sélectionnée
-      updatedWindows[appId] = {
-        ...updatedWindows[appId],
-        isMinimized: false,
-        zIndex: maxZIndex + 1
-      };
-
-      return updatedWindows;
-    });
-  };
-
   const handleFocusWindow = (appId: string) => {
     setWindows(prev => {
       const maxZIndex = Math.max(...Object.values(prev).map(w => w.zIndex));
       
-      // Minimiser toutes les autres fenêtres non minimisées
       const updatedWindows = { ...prev };
       Object.keys(updatedWindows).forEach(windowId => {
         if (windowId !== appId && updatedWindows[windowId].isOpen && !updatedWindows[windowId].isMinimized) {
@@ -131,7 +99,6 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
         }
       });
 
-      // Mettre le focus sur la fenêtre sélectionnée
       updatedWindows[appId] = {
         ...updatedWindows[appId],
         zIndex: maxZIndex + 1
@@ -140,17 +107,6 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
       return updatedWindows;
     });
   };
-
-  const minimizedApps = Object.entries(windows)
-    .filter(([_, window]) => window.isOpen && window.isMinimized)
-    .map(([id]) => {
-      const app = apps.find(a => a.id === id);
-      return {
-        id,
-        title: app?.label || '',
-        type: app?.id as 'tasks' | 'bookmarks' | 'identity'
-      };
-    });
 
   return (
     <>
@@ -179,11 +135,6 @@ export function AppDock({ activeApp, onAppClick, favorites, onToggleFavorite }: 
           })}
         </div>
       </div>
-
-      <Taskbar
-        minimizedApps={minimizedApps}
-        onRestore={handleRestoreWindow}
-      />
 
       {apps.map(app => (
         app.id !== 'identity' && windows[app.id]?.isOpen && (

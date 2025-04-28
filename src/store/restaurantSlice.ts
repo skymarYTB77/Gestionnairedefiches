@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, serverTimestamp, writeBatch, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 interface Restaurant {
@@ -14,12 +14,9 @@ interface Restaurant {
   "Horaires d'ouverture"?: string;
   Classification?: string;
   Note?: string;
-  lat?: number;
-  lng?: number;
-  category: 'Restaurants' | 'Hôtels';
+  status: 'visible' | 'accepted' | 'rejected';
   createdAt?: string;
   updatedAt?: string;
-  [key: string]: string | number | undefined;
 }
 
 interface RestaurantState {
@@ -59,16 +56,16 @@ const saveToHistory = (state: RestaurantState) => {
   state.future = [];
 };
 
-const getCollectionForStatus = (status: 'visible' | 'accepted' | 'rejected', category: 'Restaurants' | 'Hôtels') => {
-  const prefix = category.toLowerCase();
-  switch (status) {
-    case 'visible':
-      return `${prefix}_visible`;
-    case 'accepted':
-      return `${prefix}_accepted`;
-    case 'rejected':
-      return `${prefix}_rejected`;
+// Helper function to convert Firestore timestamps to ISO strings
+const convertTimestamps = (data: any): Restaurant => {
+  const converted = { ...data };
+  if (converted.createdAt?.toDate) {
+    converted.createdAt = converted.createdAt.toDate().toISOString();
   }
+  if (converted.updatedAt?.toDate) {
+    converted.updatedAt = converted.updatedAt.toDate().toISOString();
+  }
+  return converted as Restaurant;
 };
 
 export const restaurantSlice = createSlice({
@@ -82,17 +79,17 @@ export const restaurantSlice = createSlice({
       state.error = action.payload;
     },
     setInitialData: (state, action: PayloadAction<{
-      visible: Restaurant[];
-      accepted: Restaurant[];
-      rejected: Restaurant[];
+      visible: any[];
+      accepted: any[];
+      rejected: any[];
     }>) => {
-      state.visibleData = action.payload.visible;
-      state.acceptedData = action.payload.accepted;
-      state.rejectedData = action.payload.rejected;
+      state.visibleData = action.payload.visible.map(convertTimestamps);
+      state.acceptedData = action.payload.accepted.map(convertTimestamps);
+      state.rejectedData = action.payload.rejected.map(convertTimestamps);
     },
     addRestaurantSuccess: (state, action: PayloadAction<Restaurant>) => {
       saveToHistory(state);
-      state.visibleData.push(action.payload);
+      state.visibleData.push(convertTimestamps(action.payload));
     },
     deleteRestaurantSuccess: (state, action: PayloadAction<{ id: string; database: 'visible' | 'accepted' | 'rejected' }>) => {
       saveToHistory(state);
@@ -106,12 +103,13 @@ export const restaurantSlice = createSlice({
       }
     },
     moveRestaurantSuccess: (state, action: PayloadAction<{
-      restaurant: Restaurant;
+      restaurant: any;
       fromStatus: 'visible' | 'accepted' | 'rejected';
       toStatus: 'visible' | 'accepted' | 'rejected';
     }>) => {
       saveToHistory(state);
       const { restaurant, fromStatus, toStatus } = action.payload;
+      const convertedRestaurant = convertTimestamps(restaurant);
       
       if (fromStatus === 'visible') {
         state.visibleData = state.visibleData.filter(r => r.id !== restaurant.id);
@@ -122,25 +120,27 @@ export const restaurantSlice = createSlice({
       }
 
       if (toStatus === 'visible') {
-        state.visibleData.push(restaurant);
+        state.visibleData.push(convertedRestaurant);
       } else if (toStatus === 'accepted') {
-        state.acceptedData.push(restaurant);
+        state.acceptedData.push(convertedRestaurant);
       } else {
-        state.rejectedData.push(restaurant);
+        state.rejectedData.push(convertedRestaurant);
       }
     },
     updateRestaurantSuccess: (state, action: PayloadAction<{
-      restaurant: Restaurant;
+      restaurant: any;
       database: 'visible' | 'accepted' | 'rejected';
     }>) => {
       saveToHistory(state);
       const { restaurant, database } = action.payload;
+      const convertedRestaurant = convertTimestamps(restaurant);
+      
       if (database === 'visible') {
-        state.visibleData = state.visibleData.map(r => r.id === restaurant.id ? restaurant : r);
+        state.visibleData = state.visibleData.map(r => r.id === restaurant.id ? convertedRestaurant : r);
       } else if (database === 'accepted') {
-        state.acceptedData = state.acceptedData.map(r => r.id === restaurant.id ? restaurant : r);
+        state.acceptedData = state.acceptedData.map(r => r.id === restaurant.id ? convertedRestaurant : r);
       } else {
-        state.rejectedData = state.rejectedData.map(r => r.id === restaurant.id ? restaurant : r);
+        state.rejectedData = state.rejectedData.map(r => r.id === restaurant.id ? convertedRestaurant : r);
       }
     },
     undo: (state) => {
@@ -174,31 +174,35 @@ export const restaurantSlice = createSlice({
   }
 });
 
-// Helper function to convert Firestore timestamps to ISO strings
-const convertTimestamps = (doc: any) => {
-  const data = doc.data();
-  return {
-    ...data,
-    id: doc.id,
-    createdAt: data.createdAt?.toDate().toISOString(),
-    updatedAt: data.updatedAt?.toDate().toISOString()
-  };
-};
-
 // Thunks
-export const fetchRestaurants = (category: 'Restaurants' | 'Hôtels') => async (dispatch: any) => {
+export const fetchRestaurants = () => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
     
+    // Fetch from all collections
     const [visibleSnapshot, acceptedSnapshot, rejectedSnapshot] = await Promise.all([
-      getDocs(collection(db, getCollectionForStatus('visible', category))),
-      getDocs(collection(db, getCollectionForStatus('accepted', category))),
-      getDocs(collection(db, getCollectionForStatus('rejected', category)))
+      getDocs(collection(db, 'restaurants')),
+      getDocs(collection(db, 'restaurants_accepted')),
+      getDocs(collection(db, 'restaurants_rejected'))
     ]);
 
-    const visible = visibleSnapshot.docs.map(convertTimestamps) as Restaurant[];
-    const accepted = acceptedSnapshot.docs.map(convertTimestamps) as Restaurant[];
-    const rejected = rejectedSnapshot.docs.map(convertTimestamps) as Restaurant[];
+    const visible = visibleSnapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id,
+      status: 'visible'
+    })) as Restaurant[];
+
+    const accepted = acceptedSnapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id,
+      status: 'accepted'
+    })) as Restaurant[];
+
+    const rejected = rejectedSnapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id,
+      status: 'rejected'
+    })) as Restaurant[];
 
     dispatch(setInitialData({ visible, accepted, rejected }));
   } catch (error) {
@@ -211,22 +215,14 @@ export const fetchRestaurants = (category: 'Restaurants' | 'Hôtels') => async (
 export const addRestaurant = (restaurant: Omit<Restaurant, 'id'>) => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
-    const restaurantsRef = collection(db, getCollectionForStatus('visible', restaurant.category));
-    const docRef = await addDoc(restaurantsRef, {
+    const docRef = await addDoc(collection(db, 'restaurants'), {
       ...restaurant,
+      status: 'visible',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
     
-    // Convert timestamps to ISO strings before dispatching
-    const newRestaurant = {
-      ...restaurant,
-      id: docRef.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    dispatch(addRestaurantSuccess(newRestaurant));
+    dispatch(addRestaurantSuccess({ ...restaurant, id: docRef.id }));
   } catch (error) {
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
@@ -234,16 +230,14 @@ export const addRestaurant = (restaurant: Omit<Restaurant, 'id'>) => async (disp
   }
 };
 
-export const deleteRestaurant = (
-  id: string,
-  database: 'visible' | 'accepted' | 'rejected',
-  category: 'Restaurants' | 'Hôtels'
-) => async (dispatch: any) => {
+export const deleteRestaurant = (id: string, database: 'visible' | 'accepted' | 'rejected') => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
-    const collectionName = getCollectionForStatus(database, category);
-    const restaurantRef = doc(db, collectionName, id);
-    await deleteDoc(restaurantRef);
+    const collectionName = database === 'visible' ? 'restaurants' : 
+                          database === 'accepted' ? 'restaurants_accepted' : 
+                          'restaurants_rejected';
+    
+    await deleteDoc(doc(db, collectionName, id));
     dispatch(deleteRestaurantSuccess({ id, database }));
   } catch (error) {
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
@@ -261,24 +255,29 @@ export const moveRestaurant = (
     dispatch(setLoading(true));
     
     // Delete from source collection
-    const sourceCollection = getCollectionForStatus(fromStatus, restaurant.category);
-    await deleteDoc(doc(db, sourceCollection, restaurant.id!));
+    const sourceCollection = fromStatus === 'visible' ? 'restaurants' :
+                           fromStatus === 'accepted' ? 'restaurants_accepted' :
+                           'restaurants_rejected';
     
     // Add to destination collection
-    const destCollection = getCollectionForStatus(toStatus, restaurant.category);
-    const timestamp = new Date().toISOString();
-    const restaurantWithTimestamp = {
-      ...restaurant,
-      updatedAt: timestamp
-    };
+    const destCollection = toStatus === 'visible' ? 'restaurants' :
+                         toStatus === 'accepted' ? 'restaurants_accepted' :
+                         'restaurants_rejected';
     
-    const docRef = await addDoc(collection(db, destCollection), {
-      ...restaurant,
+    const { id, ...restaurantData } = restaurant;
+    
+    // Add to new collection first
+    const newDocRef = await addDoc(collection(db, destCollection), {
+      ...restaurantData,
+      status: toStatus,
       updatedAt: serverTimestamp()
     });
     
+    // Then delete from old collection
+    await deleteDoc(doc(db, sourceCollection, id!));
+    
     dispatch(moveRestaurantSuccess({ 
-      restaurant: { ...restaurantWithTimestamp, id: docRef.id }, 
+      restaurant: { ...restaurant, id: newDocRef.id, status: toStatus }, 
       fromStatus, 
       toStatus 
     }));
@@ -295,62 +294,17 @@ export const updateRestaurant = (
 ) => async (dispatch: any) => {
   try {
     dispatch(setLoading(true));
-    const collectionName = getCollectionForStatus(database, restaurant.category);
-    const restaurantRef = doc(db, collectionName, restaurant.id!);
+    const collectionName = database === 'visible' ? 'restaurants' :
+                          database === 'accepted' ? 'restaurants_accepted' :
+                          'restaurants_rejected';
     
-    const timestamp = new Date().toISOString();
-    const updatedRestaurant = {
-      ...restaurant,
-      updatedAt: timestamp
-    };
-    
-    await updateDoc(restaurantRef, {
-      ...restaurant,
+    const { id, ...updateData } = restaurant;
+    await updateDoc(doc(db, collectionName, id!), {
+      ...updateData,
       updatedAt: serverTimestamp()
     });
     
-    dispatch(updateRestaurantSuccess({ restaurant: updatedRestaurant, database }));
-  } catch (error) {
-    dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
-  } finally {
-    dispatch(setLoading(false));
-  }
-};
-
-export const importRestaurants = (restaurants: Restaurant[]) => async (dispatch: any) => {
-  try {
-    dispatch(setLoading(true));
-    const batch = writeBatch(db);
-    
-    // Group restaurants by category
-    const restaurantsByCategory = restaurants.reduce((acc, restaurant) => {
-      const category = restaurant.category || 'Restaurants';
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(restaurant);
-      return acc;
-    }, {} as Record<'Restaurants' | 'Hôtels', Restaurant[]>);
-
-    // Add each restaurant to its respective collection
-    Object.entries(restaurantsByCategory).forEach(([category, items]) => {
-      const visibleRef = collection(db, getCollectionForStatus('visible', category as 'Restaurants' | 'Hôtels'));
-      items.forEach(restaurant => {
-        const newDocRef = doc(visibleRef);
-        batch.set(newDocRef, {
-          ...restaurant,
-          category, // Ensure category is set
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-      });
-    });
-
-    await batch.commit();
-    
-    // Fetch data for the current category only
-    const currentCategory = store.getState().category.currentCategory;
-    await dispatch(fetchRestaurants(currentCategory));
+    dispatch(updateRestaurantSuccess({ restaurant, database }));
   } catch (error) {
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
   } finally {
