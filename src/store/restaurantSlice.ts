@@ -196,19 +196,19 @@ export const fetchRestaurants = () => async (dispatch: any) => {
     console.log('Raw accepted snapshot:', acceptedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     console.log('Raw rejected snapshot:', rejectedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-    const visible = visibleSnapshot.docs.map(doc => ({
+    const visible = visibleSnapshot.docs.map(doc => convertTimestamps({
       ...doc.data(),
       id: doc.id,
       status: 'visible'
     })) as Restaurant[];
 
-    const accepted = acceptedSnapshot.docs.map(doc => ({
+    const accepted = acceptedSnapshot.docs.map(doc => convertTimestamps({
       ...doc.data(),
       id: doc.id,
       status: 'accepted'
     })) as Restaurant[];
 
-    const rejected = rejectedSnapshot.docs.map(doc => ({
+    const rejected = rejectedSnapshot.docs.map(doc => convertTimestamps({
       ...doc.data(),
       id: doc.id,
       status: 'rejected'
@@ -238,9 +238,16 @@ export const addRestaurant = (restaurant: Omit<Restaurant, 'id'>) => async (disp
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
+
+    // Get the newly created document to ensure we have the timestamp values
+    const newDoc = await doc(db, 'restaurants', docRef.id).get();
+    const newRestaurant = convertTimestamps({
+      ...newDoc.data(),
+      id: docRef.id
+    });
     
     console.log('Restaurant added with ID:', docRef.id);
-    dispatch(addRestaurantSuccess({ ...restaurant, id: docRef.id }));
+    dispatch(addRestaurantSuccess(newRestaurant));
   } catch (error) {
     console.error('Error adding restaurant:', error);
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));
@@ -293,12 +300,20 @@ export const moveRestaurant = (
       status: toStatus,
       updatedAt: serverTimestamp()
     });
+
+    // Get the newly created document to ensure we have the timestamp values
+    const newDoc = await doc(db, destCollection, newDocRef.id).get();
+    const movedRestaurant = convertTimestamps({
+      ...newDoc.data(),
+      id: newDocRef.id,
+      status: toStatus
+    });
     
     await deleteDoc(doc(db, sourceCollection, id!));
     
     console.log('Restaurant moved successfully');
     dispatch(moveRestaurantSuccess({ 
-      restaurant: { ...restaurant, id: newDocRef.id, status: toStatus }, 
+      restaurant: movedRestaurant,
       fromStatus, 
       toStatus 
     }));
@@ -327,9 +342,16 @@ export const updateRestaurant = (
       ...updateData,
       updatedAt: serverTimestamp()
     });
+
+    // Get the updated document to ensure we have the latest timestamp values
+    const updatedDoc = await doc(db, collectionName, id!).get();
+    const updatedRestaurant = convertTimestamps({
+      ...updatedDoc.data(),
+      id
+    });
     
     console.log('Restaurant updated successfully');
-    dispatch(updateRestaurantSuccess({ restaurant, database }));
+    dispatch(updateRestaurantSuccess({ restaurant: updatedRestaurant, database }));
   } catch (error) {
     console.error('Error updating restaurant:', error);
     dispatch(setError(error instanceof Error ? error.message : 'Une erreur est survenue'));

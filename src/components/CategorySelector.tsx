@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCategory, addCategory, removeCategory } from '../store/categorySlice';
+import { setCategory, addCategoryToFirestore, deleteCategoryFromFirestore, fetchCategories } from '../store/categorySlice';
 import { RootState } from '../store/store';
-import { collection, addDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { 
   ChevronDown, 
   Building2, 
@@ -38,6 +36,10 @@ export function CategorySelector() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -55,45 +57,22 @@ export function CategorySelector() {
 
   const handleAddCategory = async () => {
     if (newCategory.trim()) {
-      try {
-        // Ajouter à Firestore
-        await addDoc(collection(db, 'categories'), {
-          name: newCategory.trim(),
-          createdAt: new Date()
-        });
-
-        // Mettre à jour Redux
-        dispatch(addCategory(newCategory.trim()));
-        dispatch(setCategory(newCategory.trim()));
-        setNewCategory('');
-        setShowAddModal(false);
-        setIsOpen(false);
-      } catch (error) {
-        console.error('Erreur lors de l\'ajout de la catégorie:', error);
-      }
+      await dispatch(addCategoryToFirestore(newCategory.trim()));
+      dispatch(setCategory(newCategory.trim()));
+      setNewCategory('');
+      setShowAddModal(false);
+      setIsOpen(false);
     }
   };
 
   const handleDeleteCategory = async (categoryName: string) => {
-    try {
-      // Supprimer de Firestore
-      const categoryQuery = query(
-        collection(db, 'categories'),
-        where('name', '==', categoryName)
-      );
-      const querySnapshot = await getDocs(categoryQuery);
-      
-      querySnapshot.forEach(async (doc) => {
-        await deleteDoc(doc.ref);
-      });
-
-      // Mettre à jour Redux
-      dispatch(removeCategory(categoryName));
-      setShowDeleteConfirm(false);
-      setCategoryToDelete(null);
-    } catch (error) {
-      console.error('Erreur lors de la suppression de la catégorie:', error);
+    if (categories.length <= 1) {
+      alert("Vous ne pouvez pas supprimer la dernière catégorie !");
+      return;
     }
+    await dispatch(deleteCategoryFromFirestore(categoryName));
+    setShowDeleteConfirm(false);
+    setCategoryToDelete(null);
   };
 
   const getIcon = (category: string) => {
